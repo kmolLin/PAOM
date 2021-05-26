@@ -37,10 +37,10 @@
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E03}" value="64" />
                 </element>
                 <element guid="{6519038A-1AD8-4E91-9021-66D64090CC85}" name="White Balance Blue">
-                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E03}" value="86" />
+                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E03}" value="81" />
                 </element>
                 <element guid="{6519038B-1AD8-4E91-9021-66D64090CC85}" name="White Balance Red">
-                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E03}" value="96" />
+                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E03}" value="115" />
                 </element>
                 <element guid="{AB98F78D-18A6-4EB2-A556-C11010EC9DF7}" name="WhiteBalance Mode">
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E06}" value="0" />
@@ -51,7 +51,7 @@
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E04}" value="0" />
                 </element>
                 <element guid="{B57D3000-0AC6-4819-A609-272A33140ACA}" name="Value">
-                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E08}" value="0.000000" />
+                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E08}" value="0.080000" />
                 </element>
             </item>
             <item guid="{90D5702E-E43B-4366-AAEB-7A7A10B448B4}" name="Exposure">
@@ -59,7 +59,7 @@
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E04}" value="0" />
                 </element>
                 <element guid="{B57D3000-0AC6-4819-A609-272A33140ACA}" name="Value">
-                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E08}" value="0.003172" />
+                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E08}" value="0.250000" />
                 </element>
                 <element guid="{65190390-1AD8-4E91-9021-66D64090CC85}" name="Auto">
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E04}" value="1" />

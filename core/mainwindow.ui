@@ -34,7 +34,21 @@
       <item>
        <layout class="QHBoxLayout" name="test">
         <item>
-         <widget class="QWidget" name="test_widget" native="true"/>
+         <widget class="QWidget" name="test_widget" native="true">
+          <widget class="QLabel" name="laplacian_label">
+           <property name="geometry">
+            <rect>
+             <x>60</x>
+             <y>60</y>
+             <width>111</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </widget>
         </item>
        </layout>
       </item>

@@ -15,6 +15,7 @@ import numpy as np
 import cv2
 import clr
 import os
+import math
 
 import TIS.Imaging
 from System import TimeSpan
@@ -31,6 +32,7 @@ class DisplayBuffer:
     '''
     locked = False
     pixmap = None
+    img = None
 
     def Copy(self, FrameBuffer):
         if (int(FrameBuffer.FrameType.BitsPerPixel / 8) == 4):
@@ -38,6 +40,7 @@ class DisplayBuffer:
                                 C.POINTER(C.c_ubyte * FrameBuffer.FrameType.BufferSize))
             qimage = QImage(imgcontent.contents, FrameBuffer.FrameType.Width, FrameBuffer.FrameType.Height,
                             QImage.Format_RGB32).mirrored()
+            self.img = qimage
             self.pixmap = QPixmap(qimage)
 
 
@@ -161,5 +164,59 @@ class MainWindow(QMainWindow):
     def OnDisplay(self, dispBuffer):
         copy = dispBuffer.pixmap.scaledToHeight(360)
         self.image1.setPixmap(copy)
+        ndimage = self.QImageToCvMat(dispBuffer.img)
+        canny = cv2.Canny(ndimage, 30, 150)
+        size = (640, 512)
+        shrink = cv2.resize(canny, size, interpolation=cv2.INTER_AREA)
+        shrink = cv2.cvtColor(shrink, cv2.COLOR_BGR2RGB)
+        self.QtImg = QImage(shrink.data,
+                                  shrink.shape[1],
+                                  shrink.shape[0],
+                                  QImage.Format_RGB888)
+        self.image2.setPixmap(QPixmap.fromImage(self.QtImg))
+        text = self.entropy(cv2.cvtColor(ndimage, cv2.COLOR_BGR2GRAY))
+        # print(dispBuffer.pixarray)
+        # self.converte_pixmap2array()
+        self.laplacian_label.setText(f"{text}")
         dispBuffer.locked = False
+    
+    def converte_pixmap2array(self, pixmap):
+        channels_count = 4
+        image = pixmap.toImage()
+        s = image.bits().asstring(1280 * 1024 * channels_count)
+        arr = np.fromstring(s, dtype=np.uint8).reshape((1280, 1024, channels_count))
+        # print(arr.shape)
+        
+    def QImageToCvMat(self, incomingImage):
+        '''  Converts a QImage into an opencv MAT format  '''
 
+        # incomingImage = incomingImage.convertToFormat(QImage.Format.Format_RGB32)
+
+        width = incomingImage.width()
+        height = incomingImage.height()
+        
+        ptr = incomingImage.bits()
+        ptr.setsize(height * width * 4)
+        arr = np.frombuffer(ptr, np.uint8).reshape((height, width, 4))
+        # test = np.delete(arr, -1, axis=1)
+        R, G, B, D = cv2.split(arr)
+        BGR_image = cv2.merge([B, G, R])
+        return BGR_image
+
+    
+    def Laplacina(self, img):
+        return cv2.Laplacian(img, cv2.CV_64F).var()
+
+    #entropy函数计算
+    def entropy(self, img):
+        '''
+        :param img:narray 二维灰度图像
+        :return: float 图像越清晰越大
+        '''
+        out = 0
+        count = np.shape(img)[0]*np.shape(img)[1]
+        p = np.bincount(np.array(img).flatten())
+        for i in range(0, len(p)):
+            if p[i]!=0:
+                out-=p[i]*math.log(p[i]/count)/count
+        return out
