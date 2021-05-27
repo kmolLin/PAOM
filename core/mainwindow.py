@@ -9,6 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.uic import loadUi
+from PyQt5.QtCore import pyqtSlot
 
 import ctypes as C
 import numpy as np
@@ -16,9 +17,34 @@ import cv2
 import clr
 import os
 import math
+import time
 
 import TIS.Imaging
 from System import TimeSpan
+
+
+class Thread_wait_forController(QThread):
+    lnc_signal = pyqtSignal(int)
+
+    def __init__(self, folder, parent=None):
+        QThread.__init__(self, parent)
+        self.folder = folder
+        self.flag = True
+        
+    def run(self):
+        t0 = 0
+        while self.flag:
+            if os.path.isfile(f'{self.folder}/END'):
+                os.remove(f"{self.folder}/END")
+                if t0 == 0:
+                    t0 = 1
+                    self.lnc_signal.emit(0)
+            elif os.path.isfile(f'{self.folder}/STOP'):
+                self.flag = False
+                self.remove_stopflag()
+            else:
+                t0 = 0
+            time.sleep(0.1)
 
 class SinkData:
     brightnes = 0
@@ -93,6 +119,7 @@ class MainWindow(QMainWindow):
         self.ic.Sink = self.snapsink
         # Create the sink for snapping images on demand.
         self.ic.LiveDisplay = True
+        self.flag = True
 
         try:
             self.ic.LoadDeviceStateFromFile("device.xml", True)
@@ -144,6 +171,32 @@ class MainWindow(QMainWindow):
         if self.ic.DeviceValid is True:
             self.ic.ShowPropertyDialog()
             self.ic.SaveDeviceStateToFile("device.xml")
+    
+    @pyqtSlot()
+    def on_automode_btn_clicked(self):
+        self.path = "D:/kmol/Pyquino"
+        
+        # Start the thread detectied END
+        self.lnc_thread = Thread_wait_forController(f"{self.path}")
+        self.lnc_thread.lnc_signal.connect(self.gogo_run)
+        self.lnc_thread.start()
+        
+        a = [-2, -2, -2, -2, -2, 2, 2, 2, 2, 2]
+        for i, step in enumerate(a):
+            self.endflag = True
+            f = open(f"{self.path}/START", "w")
+            f.close()
+            f = open(f'{self.path}/data.txt', 'w')
+            f.write(f"{step}")
+            f.close()
+            time.sleep(1)
+            cv2.imwrite(f"{i}.jpg", self.ndimage)
+            while self.endflag:
+                time.sleep(0.1)
+                break
+        
+    def gogo_run(self):
+        self.endflag = False
 
     def SnapImage(self):
         '''
@@ -153,6 +206,7 @@ class MainWindow(QMainWindow):
         TIS.Imaging.FrameExtensions.SaveAsBitmap(image, "test.bmp")
 
     def closeEvent(self, event):
+        self.flag = False
         if self.ic.DeviceValid is True:
             self.ic.LiveStop()
         # self.quit()
@@ -164,17 +218,17 @@ class MainWindow(QMainWindow):
     def OnDisplay(self, dispBuffer):
         copy = dispBuffer.pixmap.scaledToHeight(360)
         self.image1.setPixmap(copy)
-        ndimage = self.QImageToCvMat(dispBuffer.img)
-        canny = cv2.Canny(ndimage, 30, 150)
+        self.ndimage = self.QImageToCvMat(dispBuffer.img)
+        canny = cv2.Canny(self.ndimage, 30, 150)
         size = (640, 512)
-        shrink = cv2.resize(canny, size, interpolation=cv2.INTER_AREA)
-        shrink = cv2.cvtColor(shrink, cv2.COLOR_BGR2RGB)
-        self.QtImg = QImage(shrink.data,
-                                  shrink.shape[1],
-                                  shrink.shape[0],
-                                  QImage.Format_RGB888)
-        self.image2.setPixmap(QPixmap.fromImage(self.QtImg))
-        text = self.entropy(cv2.cvtColor(ndimage, cv2.COLOR_BGR2GRAY))
+        # shrink = cv2.resize(canny, size, interpolation=cv2.INTER_AREA)
+        # shrink = cv2.cvtColor(shrink, cv2.COLOR_BGR2RGB)
+        # self.QtImg = QImage(shrink.data,
+        #                           shrink.shape[1],
+        #                           shrink.shape[0],
+        #                           QImage.Format_RGB888)
+        # self.image2.setPixmap(QPixmap.fromImage(self.QtImg))
+        text = self.Laplacina(cv2.cvtColor(self.ndimage, cv2.COLOR_BGR2GRAY))
         # print(dispBuffer.pixarray)
         # self.converte_pixmap2array()
         self.laplacian_label.setText(f"{text}")

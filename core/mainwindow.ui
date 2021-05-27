@@ -48,6 +48,19 @@
             <string/>
            </property>
           </widget>
+          <widget class="QPushButton" name="automode_btn">
+           <property name="geometry">
+            <rect>
+             <x>90</x>
+             <y>330</y>
+             <width>75</width>
+             <height>23</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>gogo mode</string>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
