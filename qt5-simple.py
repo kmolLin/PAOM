@@ -1,8 +1,8 @@
-from PyQt5.QtGui import QPixmap, QImage         
-from PyQt5.QtWidgets import QWidget,QMainWindow, QLabel, QSizePolicy, QApplication, QAction, QHBoxLayout,QProgressBar
-#from PyQt5.QtCore import Qt,QEvent,QObject
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import QWidget, QMainWindow, QLabel, QSizePolicy, QApplication, QAction, QHBoxLayout, QProgressBar
+# from PyQt5.QtCore import Qt,QEvent,QObject
 from PyQt5.QtCore import *
-import sys,traceback
+import sys, traceback
 
 import ctypes as C
 import numpy as np
@@ -10,12 +10,12 @@ import cv2
 
 # Import PyhtonNet
 import clr
-# Load IC Imaging Control .NET 
+
+# Load IC Imaging Control .NET
 path_dll = "C:/Users/smpss/Documents/IC Imaging Control 3.5/redist/dotnet/x64/TIS.Imaging.ICImagingControl35.dll"
 
 clr.AddReference(f'{path_dll}')
 clr.AddReference('System')
-
 
 # Import the IC Imaging Control namespace.
 import TIS.Imaging
@@ -36,10 +36,13 @@ class DisplayBuffer:
     pixmap = None
 
     def Copy(self, FrameBuffer):
-        if(int(FrameBuffer.FrameType.BitsPerPixel/8 ) == 4):
-            imgcontent = C.cast(FrameBuffer.GetIntPtr().ToInt64(), C.POINTER(C.c_ubyte * FrameBuffer.FrameType.BufferSize))
-            qimage = QImage(imgcontent.contents, FrameBuffer.FrameType.Width,FrameBuffer.FrameType.Height, QImage.Format_RGB32).mirrored()
+        if (int(FrameBuffer.FrameType.BitsPerPixel / 8) == 4):
+            imgcontent = C.cast(FrameBuffer.GetIntPtr().ToInt64(),
+                                C.POINTER(C.c_ubyte * FrameBuffer.FrameType.BufferSize))
+            qimage = QImage(imgcontent.contents, FrameBuffer.FrameType.Width, FrameBuffer.FrameType.Height,
+                            QImage.Format_RGB32).mirrored()
             self.pixmap = QPixmap(qimage)
+
 
 class WorkerSignals(QObject):
     display = pyqtSignal(object)
@@ -52,13 +55,13 @@ class DisplayFilter(TIS.Imaging.FrameFilterImpl):
     with the new buffer.
     '''
     __namespace__ = "DisplayFilterClass"
-    signals = WorkerSignals() 
+    signals = WorkerSignals()
     dispBuffer = DisplayBuffer()
-    
-    def GetSupportedInputTypes(self, frameTypes):
-        frameTypes.Add( TIS.Imaging.FrameType(TIS.Imaging.MediaSubtypes.RGB32))
 
-    def GetTransformOutputTypes(self,inType, outTypes):
+    def GetSupportedInputTypes(self, frameTypes):
+        frameTypes.Add(TIS.Imaging.FrameType(TIS.Imaging.MediaSubtypes.RGB32))
+
+    def GetTransformOutputTypes(self, inType, outTypes):
         outTypes.Add(inType)
         return True
 
@@ -71,6 +74,7 @@ class DisplayFilter(TIS.Imaging.FrameFilterImpl):
 
         return False
 
+
 ####################################################################################
 
 def SelectDevice():
@@ -80,33 +84,38 @@ def SelectDevice():
         ic.LiveStart()
         ic.SaveDeviceStateToFile("device.xml")
 
+
 def ShowProperties():
     if ic.DeviceValid is True:
         ic.ShowPropertyDialog()
         ic.SaveDeviceStateToFile("device.xml")
+
 
 def SnapImage():
     '''
     Snap and save an image
     '''
     image = snapsink.SnapSingle(TimeSpan.FromSeconds(1))
-    TIS.Imaging.FrameExtensions.SaveAsBitmap(image,"test.bmp")
+    TIS.Imaging.FrameExtensions.SaveAsBitmap(image, "test.bmp")
+
 
 def Close():
     if ic.DeviceValid is True:
         ic.LiveStop()
     app.quit()
 
-def imageCallback(x,y,buffer):
+
+def imageCallback(x, y, buffer):
     print("hallo")
     return 0
 
+
 def OnDisplay(dispBuffer):
     videowindow.setPixmap(dispBuffer.pixmap)
-    dispBuffer.locked = False   
+    dispBuffer.locked = False
 
 
-app =  QApplication(sys.argv)
+app = QApplication(sys.argv)
 
 w = QMainWindow()
 w.resize(640, 480)
@@ -117,21 +126,21 @@ w.setWindowTitle('Simple Camera')
 mainMenu = w.menuBar()
 fileMenu = mainMenu.addMenu('&File')
 
-exitAct =  QAction("&Exit",app)
+exitAct = QAction("&Exit", app)
 exitAct.setStatusTip("Exit program")
 exitAct.triggered.connect(Close)
 fileMenu.addAction(exitAct)
 
 deviceMenu = mainMenu.addMenu('&Device')
-devselAct =  QAction("&Select",app)
+devselAct = QAction("&Select", app)
 devselAct.triggered.connect(SelectDevice)
 deviceMenu.addAction(devselAct)
 
-devpropAct =  QAction("&Properties",app)
+devpropAct = QAction("&Properties", app)
 devpropAct.triggered.connect(ShowProperties)
 deviceMenu.addAction(devpropAct)
 
-snapAct =  QAction("Snap &Image",app)
+snapAct = QAction("Snap &Image", app)
 snapAct.triggered.connect(SnapImage)
 deviceMenu.addAction(snapAct)
 
@@ -164,7 +173,7 @@ ic.LiveDisplay = True
 
 # Try to open the last used video capture device.
 try:
-    ic.LoadDeviceStateFromFile("device.xml",True)
+    ic.LoadDeviceStateFromFile("device.xml", True)
     if ic.DeviceValid is True:
         ic.LiveStart()
 except Exception as ex:

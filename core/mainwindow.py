@@ -23,6 +23,16 @@ import TIS.Imaging
 from System import TimeSpan
 
 
+def converte_pixmap2array(dispBuffer):
+    channels_count = 4
+    image = dispBuffer.pixmap.toImage()
+    s = image.bits().asstring(1280 * 1024 * channels_count)
+    arr = np.fromstring(s, dtype=np.uint8).reshape((1280, 1024, channels_count))
+    R, G, B, D = cv2.split(arr)
+    BGR_image = cv2.merge([B, G, R])
+    return BGR_image
+
+
 class Thread_wait_forController(QThread):
     lnc_signal = pyqtSignal(int)
 
@@ -34,17 +44,23 @@ class Thread_wait_forController(QThread):
     def run(self):
         t0 = 0
         while self.flag:
-            if os.path.isfile(f'{self.folder}/END'):
-                os.remove(f"{self.folder}/END")
-                if t0 == 0:
-                    t0 = 1
-                    self.lnc_signal.emit(0)
-            elif os.path.isfile(f'{self.folder}/STOP'):
-                self.flag = False
-                self.remove_stopflag()
-            else:
-                t0 = 0
-            time.sleep(0.1)
+            # if os.path.isfile(f'{self.folder}/END'):
+            #     os.remove(f"{self.folder}/END")
+            #     if t0 == 0:
+            #         t0 = 1
+            #         self.lnc_signal.emit(0)
+            # elif os.path.isfile(f'{self.folder}/STOP'):
+            #     self.flag = False
+            #     self.remove_stopflag()
+            # else:
+            #     t0 = 0
+            # time.sleep(0.1)
+            pass
+
+    def ttt(self, pixmap):
+        arr = converte_pixmap2array(pixmap)
+        # print(pixmap)
+
 
 class SinkData:
     brightnes = 0
@@ -103,6 +119,8 @@ class DisplayFilter(TIS.Imaging.FrameFilterImpl):
 
 class MainWindow(QMainWindow):
 
+    test_pixmap = pyqtSignal(object)
+    
     def __init__(self, parent = None):
         super(MainWindow, self).__init__()
         loadUi("core/mainwindow.ui", self)
@@ -120,6 +138,9 @@ class MainWindow(QMainWindow):
         # Create the sink for snapping images on demand.
         self.ic.LiveDisplay = True
         self.flag = True
+        
+        self.test = Thread_wait_forController("D:/kmol/Pyquino")
+        self.test_pixmap.connect(self.test.ttt)
 
         try:
             self.ic.LoadDeviceStateFromFile("device.xml", True)
@@ -218,9 +239,10 @@ class MainWindow(QMainWindow):
     def OnDisplay(self, dispBuffer):
         copy = dispBuffer.pixmap.scaledToHeight(360)
         self.image1.setPixmap(copy)
-        self.ndimage = self.QImageToCvMat(dispBuffer.img)
-        canny = cv2.Canny(self.ndimage, 30, 150)
-        size = (640, 512)
+        self.test_pixmap.emit(dispBuffer)
+        # self.ndimage = self.QImageToCvMat(dispBuffer.img)
+        # canny = cv2.Canny(self.ndimage, 30, 150)
+        # size = (640, 512)
         # shrink = cv2.resize(canny, size, interpolation=cv2.INTER_AREA)
         # shrink = cv2.cvtColor(shrink, cv2.COLOR_BGR2RGB)
         # self.QtImg = QImage(shrink.data,
@@ -228,34 +250,11 @@ class MainWindow(QMainWindow):
         #                           shrink.shape[0],
         #                           QImage.Format_RGB888)
         # self.image2.setPixmap(QPixmap.fromImage(self.QtImg))
-        text = self.Laplacina(cv2.cvtColor(self.ndimage, cv2.COLOR_BGR2GRAY))
+        # text = self.Laplacina(cv2.cvtColor(self.ndimage, cv2.COLOR_BGR2GRAY))
         # print(dispBuffer.pixarray)
         # self.converte_pixmap2array()
-        self.laplacian_label.setText(f"{text}")
+        # self.laplacian_label.setText(f"{text}")
         dispBuffer.locked = False
-    
-    def converte_pixmap2array(self, pixmap):
-        channels_count = 4
-        image = pixmap.toImage()
-        s = image.bits().asstring(1280 * 1024 * channels_count)
-        arr = np.fromstring(s, dtype=np.uint8).reshape((1280, 1024, channels_count))
-        # print(arr.shape)
-        
-    def QImageToCvMat(self, incomingImage):
-        '''  Converts a QImage into an opencv MAT format  '''
-
-        # incomingImage = incomingImage.convertToFormat(QImage.Format.Format_RGB32)
-
-        width = incomingImage.width()
-        height = incomingImage.height()
-        
-        ptr = incomingImage.bits()
-        ptr.setsize(height * width * 4)
-        arr = np.frombuffer(ptr, np.uint8).reshape((height, width, 4))
-        # test = np.delete(arr, -1, axis=1)
-        R, G, B, D = cv2.split(arr)
-        BGR_image = cv2.merge([B, G, R])
-        return BGR_image
 
     
     def Laplacina(self, img):
