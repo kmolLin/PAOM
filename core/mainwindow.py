@@ -40,26 +40,37 @@ class Thread_wait_forController(QThread):
         QThread.__init__(self, parent)
         self.folder = folder
         self.flag = True
-        
+        self.t0 = 0
+        self.image_arr = None
+        self.motion_step = None
+
     def run(self):
-        t0 = 0
-        while self.flag:
-            # if os.path.isfile(f'{self.folder}/END'):
-            #     os.remove(f"{self.folder}/END")
-            #     if t0 == 0:
-            #         t0 = 1
-            #         self.lnc_signal.emit(0)
-            # elif os.path.isfile(f'{self.folder}/STOP'):
-            #     self.flag = False
-            #     self.remove_stopflag()
-            # else:
-            #     t0 = 0
-            # time.sleep(0.1)
-            pass
+        i = 0
+        while i < len(self.motion_step):
+
+            f = open(f"{self.folder}/START", "w")
+            f.close()
+            f = open(f'{self.folder}/data.txt', 'w')
+            f.write(f"{self.motion_step[i]}")
+            f.close()
+            print(self.Laplacina(self.image_arr))
+            while True:
+                if os.path.isfile(f'{self.folder}/END'):
+                    os.remove(f'{self.folder}/END')
+                    break
+                time.sleep(0.1)
+            time.sleep(0.1)
+            i += 1
+
+    def motion(self, motion1: list):
+        self.motion_step = motion1
 
     def ttt(self, pixmap):
-        arr = converte_pixmap2array(pixmap)
+        self.image_arr = converte_pixmap2array(pixmap)
         # print(pixmap)
+
+    def Laplacina(self, img):
+        return cv2.Laplacian(img, cv2.CV_64F).var()
 
 
 class SinkData:
@@ -139,7 +150,7 @@ class MainWindow(QMainWindow):
         self.ic.LiveDisplay = True
         self.flag = True
         
-        self.test = Thread_wait_forController("D:/kmol/Pyquino")
+        self.test = Thread_wait_forController("C:/Users/smpss/kmol/Pyquino")
         self.test_pixmap.connect(self.test.ttt)
 
         try:
@@ -195,26 +206,8 @@ class MainWindow(QMainWindow):
     
     @pyqtSlot()
     def on_automode_btn_clicked(self):
-        self.path = "D:/kmol/Pyquino"
-        
-        # Start the thread detectied END
-        self.lnc_thread = Thread_wait_forController(f"{self.path}")
-        self.lnc_thread.lnc_signal.connect(self.gogo_run)
-        self.lnc_thread.start()
-        
-        a = [-2, -2, -2, -2, -2, 2, 2, 2, 2, 2]
-        for i, step in enumerate(a):
-            self.endflag = True
-            f = open(f"{self.path}/START", "w")
-            f.close()
-            f = open(f'{self.path}/data.txt', 'w')
-            f.write(f"{step}")
-            f.close()
-            time.sleep(1)
-            cv2.imwrite(f"{i}.jpg", self.ndimage)
-            while self.endflag:
-                time.sleep(0.1)
-                break
+        self.test.motion_step = [-10, -10, -10, 10, 10, 10]
+        self.test.start()
         
     def gogo_run(self):
         self.endflag = False
@@ -256,9 +249,6 @@ class MainWindow(QMainWindow):
         # self.laplacian_label.setText(f"{text}")
         dispBuffer.locked = False
 
-    
-    def Laplacina(self, img):
-        return cv2.Laplacian(img, cv2.CV_64F).var()
 
     #entropy函数计算
     def entropy(self, img):
