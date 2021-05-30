@@ -225,7 +225,7 @@ class MainWindow(QMainWindow):
         f = open("clear_fy.txt", "a+")
         f.write(f"{laplacian_value}\n")
         f.close()
-        cv2.imwrite(f"{self.count}.jpg", image)
+        cv2.imwrite(f"tmp_img/{self.count}.jpg", image)
         self.laplacian_label.setText(f"{laplacian_value}")
         self.count += 1
 
