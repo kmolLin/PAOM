@@ -18,16 +18,21 @@ import clr
 import os
 import math
 import time
+from PIL import Image
 
 import TIS.Imaging
 from System import TimeSpan
 
 
 def converte_pixmap2array(dispBuffer):
+
     channels_count = 4
+    dispBuffer.pixmap.save("test.jpg")
     image = dispBuffer.pixmap.toImage()
-    s = image.bits().asstring(1280 * 1024 * channels_count)
-    arr = np.fromstring(s, dtype=np.uint8).reshape((1280, 1024, channels_count))
+    image = image.convertToFormat(QImage.Format.Format_RGBA8888)
+    size = image.size()
+    s = image.bits().asstring(size.width() * size.height() * image.depth() // 8)  # format 0xffRRGGBB
+    arr = np.fromstring(s, dtype=np.uint8).reshape((size.height(), size.width(), image.depth() // 8))
     R, G, B, D = cv2.split(arr)
     BGR_image = cv2.merge([B, G, R])
     return BGR_image
@@ -35,6 +40,7 @@ def converte_pixmap2array(dispBuffer):
 
 class Thread_wait_forController(QThread):
     lnc_signal = pyqtSignal(int)
+    laplacian_signal = pyqtSignal(object, object)
 
     def __init__(self, folder, parent=None):
         QThread.__init__(self, parent)
@@ -53,10 +59,11 @@ class Thread_wait_forController(QThread):
             f = open(f'{self.folder}/data.txt', 'w')
             f.write(f"{self.motion_step[i]}")
             f.close()
-            print(self.Laplacina(self.image_arr))
+            # print(self.Laplacina(self.image_arr))
             while True:
                 if os.path.isfile(f'{self.folder}/END'):
                     os.remove(f'{self.folder}/END')
+                    self.laplacian_signal.emit(self.image_arr, self.Laplacina(self.image_arr))
                     break
                 time.sleep(0.1)
             time.sleep(0.1)
@@ -152,6 +159,8 @@ class MainWindow(QMainWindow):
         
         self.test = Thread_wait_forController("C:/Users/smpss/kmol/Pyquino")
         self.test_pixmap.connect(self.test.ttt)
+        self.test.laplacian_signal.connect(self.gogo_run)
+        self.count = 0
 
         try:
             self.ic.LoadDeviceStateFromFile("device.xml", True)
@@ -206,11 +215,19 @@ class MainWindow(QMainWindow):
     
     @pyqtSlot()
     def on_automode_btn_clicked(self):
-        self.test.motion_step = [-10, -10, -10, 10, 10, 10]
+        motion = [1.0] * 26
+        motion[0] = -25.0
+        self.test.motion_step = motion
         self.test.start()
         
-    def gogo_run(self):
-        self.endflag = False
+    def gogo_run(self, image, laplacian_value):
+        # test func
+        f = open("clear_fy.txt", "a+")
+        f.write(f"{laplacian_value}\n")
+        f.close()
+        cv2.imwrite(f"{self.count}.jpg", image)
+        self.laplacian_label.setText(f"{laplacian_value}")
+        self.count += 1
 
     def SnapImage(self):
         '''
