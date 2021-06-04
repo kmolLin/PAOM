@@ -38,6 +38,53 @@ def converte_pixmap2array(dispBuffer):
     return BGR_image
 
 
+class Thread_slect_focus(QThread):
+
+    def __init__(self, send_thread_handle, parent=None):
+        QThread.__init__(self, parent)
+        self.send_thread = send_thread_handle
+        self.image_arr = None
+        self.laplacian = None
+
+    def run(self):
+        # while i < 20:
+        step = 15
+        self.send_thread.motion_step = [-20]
+        self.send_thread.start()
+        self.send_thread.wait()
+        cnt = 0
+        tmp = 0
+        best_locate = 0
+        while cnt < 15:
+            cnt = cnt + 1
+            self.send_thread.motion_step = [1]
+            self.send_thread.start()
+            self.send_thread.wait()
+            if cnt == 1:
+                tmp = self.laplacian
+                continue
+
+            if self.laplacian > tmp:
+                tmp = self.laplacian
+                best_locate = cnt
+
+            if self.laplacian < tmp:
+                self.send_thread.motion_step = [-1]
+                self.send_thread.start()
+                self.send_thread.wait()
+                print(cnt)
+                break
+
+            time.sleep(0.1)
+
+    def ttt(self, pixmap):
+        self.image_arr = converte_pixmap2array(pixmap)
+
+    def get_laplacin_value(self, image, laplacian):
+        print(laplacian)
+        self.laplacian = laplacian
+
+
 class Thread_wait_forController(QThread):
     lnc_signal = pyqtSignal(int)
     laplacian_signal = pyqtSignal(object, object)
@@ -59,14 +106,13 @@ class Thread_wait_forController(QThread):
             f = open(f'{self.folder}/data.txt', 'w')
             f.write(f"{self.motion_step[i]}")
             f.close()
-            # print(self.Laplacina(self.image_arr))
             while True:
                 if os.path.isfile(f'{self.folder}/END'):
                     os.remove(f'{self.folder}/END')
                     self.laplacian_signal.emit(self.image_arr, self.Laplacina(self.image_arr))
                     break
-                time.sleep(0.1)
-            time.sleep(0.1)
+                time.sleep(0.5)
+            time.sleep(1)
             i += 1
 
     def motion(self, motion1: list):
@@ -159,7 +205,12 @@ class MainWindow(QMainWindow):
         
         self.test = Thread_wait_forController("C:/Users/smpss/kmol/Pyquino")
         self.test_pixmap.connect(self.test.ttt)
-        self.test.laplacian_signal.connect(self.gogo_run)
+
+        self.brain_focus = Thread_slect_focus(self.test)
+        self.test_pixmap.connect(self.brain_focus.ttt)
+
+        self.test.laplacian_signal.connect(self.brain_focus.get_laplacin_value)
+        # self.test.laplacian_signal.connect(self.gogo_run)
         self.count = 0
 
         try:
@@ -172,6 +223,9 @@ class MainWindow(QMainWindow):
 
         # Connect the display signal handler to our filter.
         # self.image1
+
+    def finff(self):
+        print("finished")
 
     def __init_setting(self):
         # Load IC Imaging Control .NET
@@ -215,19 +269,30 @@ class MainWindow(QMainWindow):
     
     @pyqtSlot()
     def on_automode_btn_clicked(self):
-        motion = [1.0] * 26
-        motion[0] = -25.0
-        self.test.motion_step = motion
-        self.test.start()
-        
+        self.brain_focus.start()
+        # motion = [1.0] * 26
+        # motion[0] = -25.0
+        # self.test.motion_step = [-5]
+        # self.test.start()
+        # self.test.wait()
+        # for i in [1, 1, 1, 1, 1]:
+        #     self.test.motion_step = [i]
+        #     self.test.start()
+        #     self.test.wait()
+
     def gogo_run(self, image, laplacian_value):
         # test func
-        f = open("clear_fy.txt", "a+")
-        f.write(f"{laplacian_value}\n")
-        f.close()
-        cv2.imwrite(f"tmp_img/{self.count}.jpg", image)
-        self.laplacian_label.setText(f"{laplacian_value}")
-        self.count += 1
+        print(laplacian_value)
+        # f = open("clear_fy.txt", "a+")
+        # f.write(f"{laplacian_value}\n")
+        # f.close()
+        # cv2.imwrite(f"tmp_img/{self.count}.jpg", image)
+        # self.laplacian_label.setText(f"{laplacian_value}")
+        # self.count += 1
+
+    @pyqtSlot()
+    def on_test_focus_btn_clicked(self):
+        print("test")
 
     def SnapImage(self):
         '''

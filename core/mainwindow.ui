@@ -100,6 +100,19 @@
             </item>
            </layout>
           </widget>
+          <widget class="QPushButton" name="test_focus_btn">
+           <property name="geometry">
+            <rect>
+             <x>160</x>
+             <y>370</y>
+             <width>62</width>
+             <height>19</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>test</string>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
