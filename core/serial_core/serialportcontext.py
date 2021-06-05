@@ -89,7 +89,7 @@ class SerialPortContext(QtCore.QObject, object):
         self._recvSignal_.connect(callback)
 
     def recall(self):
-        print("test, im recall")
+        pass
 
     def open(self):
         self._serial_port_ = serial.Serial(self._port_, int(self._baud_))

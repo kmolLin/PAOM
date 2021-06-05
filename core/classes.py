@@ -16,6 +16,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from System import TimeSpan
+from core.serial_core.serialportcontext import SerialPortContext
 
 
 def converte_pixmap2array(dispBuffer):
@@ -77,6 +78,34 @@ class Thread_slect_focus(QThread):
     def get_laplacin_value(self, image, laplacian):
         print(laplacian)
         self.laplacian = laplacian
+
+
+class SerialMachine(QThread):
+    """Qthread 使得serial port 一直執行，但是又需要從外部塞值進含式控制"""
+    _receive_signal = pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        QThread.__init__(self, parent)
+        self.port = "COM3"
+        self.baud = 115200
+
+    def __data_received__(self, data):
+        # self._receive_signal.emit(data)
+        print(data)
+
+    def gogo(self, abc: list):
+        abc = [1, 2, 3, 4]
+        self.tmp = [i for i in abc]
+
+    def run(self):
+        self._serial_context_ = SerialPortContext(port=self.port, baud=self.baud)
+        self._serial_context_.recall()
+        self._serial_context_.registerReceivedCallback(self.__data_received__)
+        self._serial_context_.open()
+
+        time.sleep(3)
+        self._serial_context_.close()
+
 
 
 class Thread_wait_forController(QThread):

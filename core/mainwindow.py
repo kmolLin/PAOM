@@ -9,7 +9,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSlot
-from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter
+from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter, SerialMachine
+from core.serial_core.serialportcontext import SerialPortContext
 
 import numpy as np
 import math
@@ -49,6 +50,8 @@ class MainWindow(QMainWindow):
         self.test.laplacian_signal.connect(self.brain_focus.get_laplacin_value)
         self.count = 0
 
+        self._serial_context_ = SerialPortContext(port="COM0", baud=0)
+
         try:
             self.ic.LoadDeviceStateFromFile("device.xml", True)
             if self.ic.DeviceValid is True:
@@ -56,9 +59,6 @@ class MainWindow(QMainWindow):
         except Exception as ex:
             print(ex)
             pass
-
-        # Connect the display signal handler to our filter.
-        # self.image1
 
     def finff(self):
         print("finished")
@@ -113,7 +113,26 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_test_focus_btn_clicked(self):
-        print("test")
+        if self._serial_context_.isRunning():
+            self._serial_context_.close()
+        else:
+            try:
+                port = "COM3"
+                baud = 115200
+                self._serial_context_ = SerialPortContext(port=port, baud=baud)
+                self._serial_context_.recall()
+                self._serial_context_.registerReceivedCallback(self.__data_received__)
+                self._serial_context_.open()
+                self.pushButtonOpenSerial.setText(u'close')
+            except :
+                pass
+                # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
+
+    def __data_received__(self, data):
+        for c in range(len(data)):
+            self.textEditReceived2.insertPlainText(data[c])
+            sb = self.textEditReceived2.verticalScrollBar()
+            sb.setValue(sb.maximum())
 
     def SnapImage(self):
         '''
@@ -126,7 +145,10 @@ class MainWindow(QMainWindow):
         self.flag = False
         if self.ic.DeviceValid is True:
             self.ic.LiveStop()
-        # self.quit()
+
+        self._is_auto_sending = False
+        if self._serial_context_.isRunning():
+            self._serial_context_.close()
 
     def imageCallback(self, x, y, buffer):
         print("hallo")

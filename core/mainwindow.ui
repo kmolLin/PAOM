@@ -113,6 +113,16 @@
             <string>test</string>
            </property>
           </widget>
+          <widget class="QTextEdit" name="textEditReceived2">
+           <property name="geometry">
+            <rect>
+             <x>40</x>
+             <y>420</y>
+             <width>211</width>
+             <height>121</height>
+            </rect>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
