@@ -210,7 +210,6 @@ class MainWindow(QMainWindow):
         self.test_pixmap.connect(self.brain_focus.ttt)
 
         self.test.laplacian_signal.connect(self.brain_focus.get_laplacin_value)
-        # self.test.laplacian_signal.connect(self.gogo_run)
         self.count = 0
 
         try:
