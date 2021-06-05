@@ -65,7 +65,7 @@
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E04}" value="1" />
                 </element>
                 <element guid="{6519038C-1AD8-4E91-9021-66D64090CC85}" name="Auto Reference">
-                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E03}" value="128" />
+                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E03}" value="125" />
                 </element>
             </item>
             <item guid="{90D57031-E43B-4366-AAEB-7A7A10B448B4}" name="Trigger">
