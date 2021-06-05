@@ -107,7 +107,6 @@ class SerialMachine(QThread):
         self._serial_context_.close()
 
 
-
 class Thread_wait_forController(QThread):
     lnc_signal = pyqtSignal(int)
     laplacian_signal = pyqtSignal(object, object)

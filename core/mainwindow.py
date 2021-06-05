@@ -128,6 +128,12 @@ class MainWindow(QMainWindow):
                 pass
                 # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
 
+    def __test__send(self, data1):
+        data = str(data1 + '\n')
+        if self._serial_context_.isRunning():
+            if len(data) > 0:
+                self._serial_context_.send(data, 0)
+
     def __data_received__(self, data):
         for c in range(len(data)):
             self.textEditReceived2.insertPlainText(data[c])
@@ -140,6 +146,15 @@ class MainWindow(QMainWindow):
         '''
         image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
         TIS.Imaging.FrameExtensions.SaveAsBitmap(image, "test.bmp")
+
+    @pyqtSlot()
+    def on_check_btn_clicked(self):
+        self.qti = QTimer()
+        self.qti.timeout.connect(self.aaa)
+        self.qti.start(500)
+
+    def aaa(self):
+        self.__test__send("?")
 
     def closeEvent(self, event):
         self.flag = False
