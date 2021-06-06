@@ -44,7 +44,7 @@ class Thread_slect_focus(QThread):
     def run(self):
         # while i < 20:
         step = 15
-        self.send_thread.motion_step = [-20]
+        self.send_thread.motion_step = [-15]
         self.send_thread.start()
         self.send_thread.wait()
         cnt = 0
@@ -55,20 +55,20 @@ class Thread_slect_focus(QThread):
             self.send_thread.motion_step = [1]
             self.send_thread.start()
             self.send_thread.wait()
-            if cnt == 1:
-                tmp = self.laplacian
-                continue
-
-            if self.laplacian > tmp:
-                tmp = self.laplacian
-                best_locate = cnt
-
-            if self.laplacian < tmp:
-                self.send_thread.motion_step = [-1]
-                self.send_thread.start()
-                self.send_thread.wait()
-                print(cnt)
-                break
+            # if cnt == 1:
+            #     tmp = self.laplacian
+            #     continue
+            #
+            # if self.laplacian > tmp:
+            #     tmp = self.laplacian
+            #     best_locate = cnt
+            #
+            # if self.laplacian < tmp:
+            #     self.send_thread.motion_step = [-1]
+            #     self.send_thread.start()
+            #     self.send_thread.wait()
+            #     print(cnt)
+            #     break
 
             time.sleep(0.1)
 
@@ -118,27 +118,50 @@ class Thread_wait_forController(QThread):
         self.t0 = 0
         self.image_arr = None
         self.motion_step = None
+        self.serial_hadle = None
+        self.status_flag = False
 
     def run(self):
         i = 0
-        while i < len(self.motion_step):
+        if self.serial_hadle.isRunning():
+            while i < len(self.motion_step):
+                text = f"$J=G21G91Y{self.motion_step[i]}F250"
+                self.__test__send(self.serial_hadle, f"{text}")  # this line is command
 
-            f = open(f"{self.folder}/START", "w")
-            f.close()
-            f = open(f'{self.folder}/data.txt', 'w')
-            f.write(f"{self.motion_step[i]}")
-            f.close()
-            while True:
-                if os.path.isfile(f'{self.folder}/END'):
-                    os.remove(f'{self.folder}/END')
-                    self.laplacian_signal.emit(self.image_arr, self.Laplacina(self.image_arr))
-                    break
-                time.sleep(0.5)
-            time.sleep(1)
-            i += 1
+                while True:
+                    self.__test__send(self.serial_hadle, "?")
+                    if self.status_flag == True:
+                        self.laplacian_signal.emit(self.image_arr, self.Laplacina(self.image_arr))
+                        break
+                    else:
+                        time.sleep(0.5)
+                time.sleep(1)
+                self.status_flag = False
+                i += 1
+
+    def __test__send(self, contex, data1):
+        data = str(data1 + '\n')
+        if contex.isRunning():
+            if len(data) > 0:
+                contex.send(data, 0)
+
+    def test_received(self, data):
+        if data.startswith("<Idle"):
+            x, y, z = data.split("|")[1].split(":")[1].split(",")
+            print(f"X:{x} Y:{y} Z:{z}")
+            self.status_flag = True
+
+        elif data.startswith("<Run|"):
+            pass
+
+    def aaa(self):
+        self.__test__send(self.serial_hadle, "?")
 
     def motion(self, motion1: list):
         self.motion_step = motion1
+
+    def get_serial_handle(self, serial_handle):
+        self.serial_hadle = serial_handle
 
     def ttt(self, pixmap):
         self.image_arr = converte_pixmap2array(pixmap)

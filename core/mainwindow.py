@@ -14,6 +14,7 @@ from core.serial_core.serialportcontext import SerialPortContext
 
 import numpy as np
 import math
+import time
 
 import TIS.Imaging
 from System import TimeSpan
@@ -22,6 +23,7 @@ from System import TimeSpan
 class MainWindow(QMainWindow):
 
     test_pixmap = pyqtSignal(object)
+    _receive_signal = pyqtSignal(str)
     
     def __init__(self, parent = None):
         super(MainWindow, self).__init__()
@@ -51,6 +53,7 @@ class MainWindow(QMainWindow):
         self.count = 0
 
         self._serial_context_ = SerialPortContext(port="COM0", baud=0)
+        self._receive_signal.connect(self.test.test_received)
 
         try:
             self.ic.LoadDeviceStateFromFile("device.xml", True)
@@ -123,10 +126,14 @@ class MainWindow(QMainWindow):
                 self._serial_context_.recall()
                 self._serial_context_.registerReceivedCallback(self.__data_received__)
                 self._serial_context_.open()
-                self.pushButtonOpenSerial.setText(u'close')
+                self.test.get_serial_handle(self._serial_context_)
             except :
                 pass
                 # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
+
+        time.sleep(2)
+        # unlock the machine
+        self.__test__send("$X")  # unlock the machine
 
     def __test__send(self, data1):
         data = str(data1 + '\n')
@@ -135,6 +142,7 @@ class MainWindow(QMainWindow):
                 self._serial_context_.send(data, 0)
 
     def __data_received__(self, data):
+        self._receive_signal.emit(data)
         for c in range(len(data)):
             self.textEditReceived2.insertPlainText(data[c])
             sb = self.textEditReceived2.verticalScrollBar()
