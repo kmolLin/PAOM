@@ -53,13 +53,13 @@ class Thread_slect_focus(QThread):
         tmp = []
         while cnt < 15:
 
-            self.send_thread.motion_step = [1]
+            self.send_thread.motion_step = [0.1]
             self.send_thread.start()
             self.send_thread.wait()
             tmp.append(self.laplacian)
             cnt = cnt + 1
 
-            time.sleep(0.1)
+            self.msleep(100)
         self.send_thread.motion_step = [tmp.index(max(tmp)) - 15]
         self.send_thread.start()
         self.send_thread.wait()
@@ -95,12 +95,12 @@ class Thread_wait_forController(QThread):
 
                 while True:
                     self.__test__send(self.serial_hadle, "?")
-                    if self.status_flag == True:
+                    if self.status_flag:
                         self.laplacian_signal.emit(self.image_arr, self.Laplacina(self.image_arr))
                         break
                     else:
-                        time.sleep(0.3)
-                time.sleep(0.2)
+                        self.msleep(500)
+                self.msleep(200)
                 self.status_flag = False
                 i += 1
 

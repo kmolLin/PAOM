@@ -1,7 +1,7 @@
 <device_state libver="3.5" filemajor="1" fileminor="0">
     <device name="DFK 33UP1300" base_name="DFK 33UP1300" unique_name="DFK 33UP1300 20124089">
         <videoformat>RGB32 (1280x1024)</videoformat>
-        <fps>60.000240</fps>
+        <fps>210.000210</fps>
         <vcdpropertyitems>
             <item guid="{8E972004-3B94-4AA4-A899-65F6A1432713}" name="Startup Behavior" />
             <item guid="{284C0E06-010B-45BF-8291-09D90A459B28}" name="Brightness">
@@ -59,7 +59,7 @@
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E04}" value="0" />
                 </element>
                 <element guid="{B57D3000-0AC6-4819-A609-272A33140ACA}" name="Value">
-                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E08}" value="0.028543" />
+                    <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E08}" value="0.013723" />
                 </element>
                 <element guid="{65190390-1AD8-4E91-9021-66D64090CC85}" name="Auto">
                     <itf guid="{99B44940-BFE1-4083-ADA1-BE703F4B8E04}" value="1" />
