@@ -9,7 +9,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSlot
-from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter, SerialMachine
+from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter
 from core.serial_core.serialportcontext import SerialPortContext
 
 import numpy as np

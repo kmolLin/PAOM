@@ -50,27 +50,19 @@ class Thread_slect_focus(QThread):
         cnt = 0
         tmp = 0
         best_locate = 0
+        tmp = []
         while cnt < 15:
-            cnt = cnt + 1
+
             self.send_thread.motion_step = [1]
             self.send_thread.start()
             self.send_thread.wait()
-            # if cnt == 1:
-            #     tmp = self.laplacian
-            #     continue
-            #
-            # if self.laplacian > tmp:
-            #     tmp = self.laplacian
-            #     best_locate = cnt
-            #
-            # if self.laplacian < tmp:
-            #     self.send_thread.motion_step = [-1]
-            #     self.send_thread.start()
-            #     self.send_thread.wait()
-            #     print(cnt)
-            #     break
+            tmp.append(self.laplacian)
+            cnt = cnt + 1
 
             time.sleep(0.1)
+        self.send_thread.motion_step = [tmp.index(max(tmp)) - 15]
+        self.send_thread.start()
+        self.send_thread.wait()
 
     def ttt(self, pixmap):
         self.image_arr = converte_pixmap2array(pixmap)
@@ -78,33 +70,6 @@ class Thread_slect_focus(QThread):
     def get_laplacin_value(self, image, laplacian):
         print(laplacian)
         self.laplacian = laplacian
-
-
-class SerialMachine(QThread):
-    """Qthread 使得serial port 一直執行，但是又需要從外部塞值進含式控制"""
-    _receive_signal = pyqtSignal(str)
-
-    def __init__(self, parent=None):
-        QThread.__init__(self, parent)
-        self.port = "COM3"
-        self.baud = 115200
-
-    def __data_received__(self, data):
-        # self._receive_signal.emit(data)
-        print(data)
-
-    def gogo(self, abc: list):
-        abc = [1, 2, 3, 4]
-        self.tmp = [i for i in abc]
-
-    def run(self):
-        self._serial_context_ = SerialPortContext(port=self.port, baud=self.baud)
-        self._serial_context_.recall()
-        self._serial_context_.registerReceivedCallback(self.__data_received__)
-        self._serial_context_.open()
-
-        time.sleep(3)
-        self._serial_context_.close()
 
 
 class Thread_wait_forController(QThread):
@@ -134,8 +99,8 @@ class Thread_wait_forController(QThread):
                         self.laplacian_signal.emit(self.image_arr, self.Laplacina(self.image_arr))
                         break
                     else:
-                        time.sleep(0.5)
-                time.sleep(1)
+                        time.sleep(0.3)
+                time.sleep(0.2)
                 self.status_flag = False
                 i += 1
 
