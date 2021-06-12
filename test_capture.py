@@ -127,13 +127,13 @@ if __name__ == "__main__":
             clone = resized.copy()
             cv2.rectangle(clone, (x, y), (x + winW, y + winH), (0, 255, 0), 2)
             crop_area = resized[y: y + winH, x:x + winW]
-            # cv2.namedWindow("Window", cv2.WINDOW_NORMAL)
+            cv2.namedWindow("Window", cv2.WINDOW_NORMAL)
             cv2.namedWindow("crop Area", cv2.WINDOW_NORMAL)
             cv2.imshow("Window", clone)
             cv2.imshow("crop Area", crop_area)
             cv2.waitKey(1)
             time.sleep(0.025)
-    print(time.time() - old)
+    # print(time.time() - old)
     # for i in range(300):
     #     dst, theta = runcode("tmp.jpeg", f"tmp_img/test/{i}.jpeg")
     #     if dst is None:

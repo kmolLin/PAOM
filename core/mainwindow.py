@@ -112,7 +112,15 @@ class MainWindow(QMainWindow):
 
     def gogo_run(self, image, laplacian_value):
         # test func
-        print(laplacian_value)
+        self.__test__send("G28 Y0")
+        
+    @pyqtSlot()
+    def on_machine_home_btn_clicked(self):
+        self.__test__send("G28 Y0")
+        self.__test__send("G91")
+        self.__test__send("G1 Y20 F500")
+        self.__test__send("G90")
+        self.__test__send("M114")
 
     @pyqtSlot()
     def on_test_focus_btn_clicked(self):
@@ -120,7 +128,7 @@ class MainWindow(QMainWindow):
             self._serial_context_.close()
         else:
             try:
-                port = "COM3"
+                port = "COM4"
                 baud = 115200
                 self._serial_context_ = SerialPortContext(port=port, baud=baud)
                 self._serial_context_.recall()
@@ -133,12 +141,13 @@ class MainWindow(QMainWindow):
 
         time.sleep(2)
         # unlock the machine
-        self.__test__send("$X")  # unlock the machine
+        # self.__test__send("$X")  # unlock the machine
 
     def __test__send(self, data1):
         data = str(data1 + '\n')
         if self._serial_context_.isRunning():
             if len(data) > 0:
+                print(data)
                 self._serial_context_.send(data, 0)
 
     def __data_received__(self, data):

@@ -44,25 +44,25 @@ class Thread_slect_focus(QThread):
     def run(self):
         # while i < 20:
         step = 15
-        self.send_thread.motion_step = [-15]
-        self.send_thread.start()
-        self.send_thread.wait()
+        # self.send_thread.motion_step = [-15]
+        # self.send_thread.start()
+        # self.send_thread.wait()
         cnt = 0
         tmp = 0
         best_locate = 0
         tmp = []
         while cnt < 15:
 
-            self.send_thread.motion_step = [0.1]
+            self.send_thread.motion_step = [10]
             self.send_thread.start()
             self.send_thread.wait()
             tmp.append(self.laplacian)
             cnt = cnt + 1
 
             self.msleep(100)
-        self.send_thread.motion_step = [tmp.index(max(tmp)) - 15]
-        self.send_thread.start()
-        self.send_thread.wait()
+        # self.send_thread.motion_step = [tmp.index(max(tmp)) - 15]
+        # self.send_thread.start()
+        # self.send_thread.wait()
 
     def ttt(self, pixmap):
         self.image_arr = converte_pixmap2array(pixmap)
@@ -85,16 +85,17 @@ class Thread_wait_forController(QThread):
         self.motion_step = None
         self.serial_hadle = None
         self.status_flag = False
+        self.staMode = False
 
     def run(self):
         i = 0
         if self.serial_hadle.isRunning():
             while i < len(self.motion_step):
-                text = f"$J=G21G91Y{self.motion_step[i]}F250"
-                self.__test__send(self.serial_hadle, f"{text}")  # this line is command
-
+                self.ramps_command(self.motion_step[i])
+                # text = f"$J=G21G91Y{self.motion_step[i]}F250"                
+                # self.__test__send(self.serial_hadle, f"{text}")  # this line is command
+                # self.__test__send(self.serial_hadle, "M114")
                 while True:
-                    self.__test__send(self.serial_hadle, "?")
                     if self.status_flag:
                         self.laplacian_signal.emit(self.image_arr, self.Laplacina(self.image_arr))
                         break
@@ -102,7 +103,15 @@ class Thread_wait_forController(QThread):
                         self.msleep(500)
                 self.msleep(200)
                 self.status_flag = False
+                self.staMode = False
                 i += 1
+    
+    def ramps_command(self, move_distance):
+        self.__test__send(self.serial_hadle, "G91")
+        self.__test__send(self.serial_hadle, f"G1 Y{move_distance} F500")
+        self.__test__send(self.serial_hadle, "G90")
+        self.__test__send(self.serial_hadle, "M114")
+        self.staMode = True
 
     def __test__send(self, contex, data1):
         data = str(data1 + '\n')
@@ -111,10 +120,13 @@ class Thread_wait_forController(QThread):
                 contex.send(data, 0)
 
     def test_received(self, data):
-        if data.startswith("<Idle"):
-            x, y, z = data.split("|")[1].split(":")[1].split(",")
-            print(f"X:{x} Y:{y} Z:{z}")
-            self.status_flag = True
+        if data.startswith("echo:busy") or self.staMode:
+            print(data)
+            if data.startswith("X:"):
+                print(data)
+                # x, y, z = data.split("|")[1].split(":")[1].split(",")
+                # print(f"X:{x} Y:{y} Z:{z}")
+                self.status_flag = True
 
         elif data.startswith("<Run|"):
             pass
