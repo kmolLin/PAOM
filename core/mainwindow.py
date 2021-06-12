@@ -7,6 +7,7 @@ __email__ = "pyquino@gmail.com"
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSlot
 from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter
@@ -15,6 +16,7 @@ from core.serial_core.serialportcontext import SerialPortContext
 import numpy as np
 import math
 import time
+from . import icon
 
 import TIS.Imaging
 from System import TimeSpan
@@ -55,6 +57,9 @@ class MainWindow(QMainWindow):
         self._serial_context_ = SerialPortContext(port="COM0", baud=0)
         self._receive_signal.connect(self.test.test_received)
 
+        # test for for the form
+        # self.image_btn.setIcon(QIcon("images/control_xy.png"))
+
         try:
             self.ic.LoadDeviceStateFromFile("device.xml", True)
             if self.ic.DeviceValid is True:
@@ -70,6 +75,61 @@ class MainWindow(QMainWindow):
         # Load IC Imaging Control .NET
         # Import the IC Imaging Control namespace.
         pass
+
+    def _serial_button_Setting(self):
+
+        tmp = {
+            self.left_up: [-1, 1],
+            self.yAxisup: [0, 1],
+            self.right_up: [1, 1],
+            self.xAxisrigh: [1, 0],
+            self.right_down: [1, -1],
+            self.yAxisdown: [0, -1],
+            self.left_down: [-1, -1],
+            self.xAxisleft: [-1, 0],
+        }
+        self.numberz = self.stepbox.value()
+
+        def make_func(btn):
+            @pyqtSlot()
+            def dynamic():
+                x = f"{tmp[btn][0] * self.stepbox.value()}"
+                y = f"{tmp[btn][1] * self.stepbox.value()}"
+                f = self.feedbox.value()
+                data = f"G91\nG1X{x}Y{y}F{f}\nG90\nM114\n"
+                self.__test__send(data)
+            return dynamic
+        for i, btn in enumerate(tmp):
+            btn.setEnabled(True)
+            f = make_func(btn)
+            btn.clicked.connect(f)
+            # print(btn, f"-> {tmp[btn]}")
+
+        tmps = {
+            self.machine_homex_btn: "X",
+            self.machine_homey_btn: "Y",
+            self.machine_homez_btn: "Z",
+        }
+
+        def make_func_home(btn):
+            @pyqtSlot()
+            def d():
+                data = f"G28 {tmps[btn]}0\nM114\n"
+                self.__test__send(data)
+            return d
+
+        for i, btn in enumerate(tmps):
+            btn.setEnabled(True)
+            f = make_func_home(btn)
+            btn.clicked.connect(f)
+        # self.xAxisrigh
+        # self.right_down
+        # self.yAxisdown
+        # self.left_down
+        # self.xAxisleft
+
+    # @pyqtSlot()
+    # def on_left_up_cliecked(self):
 
     def _add_action(self):
         # Create the menu
@@ -135,6 +195,8 @@ class MainWindow(QMainWindow):
                 self._serial_context_.registerReceivedCallback(self.__data_received__)
                 self._serial_context_.open()
                 self.test.get_serial_handle(self._serial_context_)
+                # start the the button
+                self._serial_button_Setting()
             except :
                 pass
                 # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
