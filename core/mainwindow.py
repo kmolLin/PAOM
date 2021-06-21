@@ -197,11 +197,12 @@ class MainWindow(QMainWindow):
                 self.test.get_serial_handle(self._serial_context_)
                 # start the the button
                 self._serial_button_Setting()
+                self.run_servo.setEnabled(True)
             except :
                 pass
                 # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
 
-        time.sleep(2)
+        # time.sleep(2)
         # unlock the machine
         # self.__test__send("$X")  # unlock the machine
 
@@ -231,6 +232,12 @@ class MainWindow(QMainWindow):
         self.qti = QTimer()
         self.qti.timeout.connect(self.aaa)
         self.qti.start(500)
+
+    @pyqtSlot()
+    def on_run_servo_clicked(self):
+        value = self.servo_spin.value()
+        self.__test__send(f"M280 P0 S{value}")
+
 
     def aaa(self):
         self.__test__send("?")
