@@ -59,6 +59,10 @@ class MainWindow(QMainWindow):
 
         # test for for the form
         # self.image_btn.setIcon(QIcon("images/control_xy.png"))
+        # setting Qslider
+        self.servo_slider.valueChanged.connect(self.sliderChanged)
+        self.servo_slider.sliderPressed.connect(self.sldDisconnect)
+        self.servo_slider.sliderReleased.connect(self.sldReconnect)
 
         try:
             self.ic.LoadDeviceStateFromFile("device.xml", True)
@@ -198,6 +202,7 @@ class MainWindow(QMainWindow):
                 # start the the button
                 self._serial_button_Setting()
                 self.run_servo.setEnabled(True)
+                self.servo_slider.setEnabled(True)
             except :
                 pass
                 # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
@@ -227,20 +232,31 @@ class MainWindow(QMainWindow):
         image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
         TIS.Imaging.FrameExtensions.SaveAsBitmap(image, "test.bmp")
 
-    @pyqtSlot()
-    def on_check_btn_clicked(self):
-        self.qti = QTimer()
-        self.qti.timeout.connect(self.aaa)
-        self.qti.start(500)
+    # @pyqtSlot()
+    # def on_check_btn_clicked(self):
+    #     self.qti = QTimer()
+    #     self.qti.timeout.connect(self.aaa)
+    #     self.qti.start(500)
 
     @pyqtSlot()
     def on_run_servo_clicked(self):
         value = self.servo_spin.value()
         self.__test__send(f"M280 P0 S{value}")
 
+    def sldDisconnect(self):
+        self.sender().valueChanged.disconnect()
 
-    def aaa(self):
-        self.__test__send("?")
+    def sldReconnect(self):
+        self.sender().valueChanged.connect(self.sliderChanged)
+        self.sender().valueChanged.emit(self.sender().value())
+
+    def sliderChanged(self):
+        # print(self.sender().objectName() + " : " + str(self.sender().value()))
+        self.servo_spin.setValue(self.sender().value())
+        self.__test__send(f"M280 P0 S{self.sender().value()}")
+
+    # def aaa(self):
+    #     self.__test__send("?")
 
     def closeEvent(self, event):
         self.flag = False

@@ -397,6 +397,9 @@
                   <property name="minimum">
                    <double>-100.000000000000000</double>
                   </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
+                  </property>
                  </widget>
                 </item>
                 <item>
@@ -510,6 +513,22 @@
              <widget class="QLabel" name="label">
               <property name="text">
                <string>angel 0~180</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="servo_slider">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="maximum">
+               <number>180</number>
+              </property>
+              <property name="singleStep">
+               <number>5</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>

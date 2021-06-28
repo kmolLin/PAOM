@@ -22,7 +22,7 @@ from core.serial_core.serialportcontext import SerialPortContext
 def converte_pixmap2array(dispBuffer):
 
     channels_count = 4
-    dispBuffer.pixmap.save("test.jpg")
+    # dispBuffer.pixmap.save("test.jpg")
     image = dispBuffer.pixmap.toImage()
     image = image.convertToFormat(QImage.Format.Format_RGBA8888)
     size = image.size()
