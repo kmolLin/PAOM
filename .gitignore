@@ -132,3 +132,7 @@ dmypy.json
 *.bmp
 *.idea
 /tmp_img
+
+# pytorch AI model
+*.pth
+*.pt

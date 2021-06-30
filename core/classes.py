@@ -33,6 +33,17 @@ def converte_pixmap2array(dispBuffer):
     return BGR_image
 
 
+def conver_qimage2array(img: QImage):
+
+    image = img.convertToFormat(QImage.Format.Format_RGBA8888)
+    size = image.size()
+    s = image.bits().asstring(size.width() * size.height() * image.depth() // 8)  # format 0xffRRGGBB
+    arr = np.fromstring(s, dtype=np.uint8).reshape((size.height(), size.width(), image.depth() // 8))
+    R, G, B, D = cv2.split(arr)
+    BGR_image = cv2.merge([B, G, R])
+    return BGR_image
+
+
 class Thread_slect_focus(QThread):
 
     def __init__(self, send_thread_handle, parent=None):

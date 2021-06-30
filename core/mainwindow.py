@@ -10,12 +10,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSlot
-from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter
+from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter, DisplayBuffer, conver_qimage2array
 from core.serial_core.serialportcontext import SerialPortContext
+from core.ai_detected.run_model import run_model_method
 
 import numpy as np
 import math
 import time
+import cv2
 from . import icon
 
 import TIS.Imaging
@@ -232,11 +234,22 @@ class MainWindow(QMainWindow):
         image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
         TIS.Imaging.FrameExtensions.SaveAsBitmap(image, "test.bmp")
 
-    # @pyqtSlot()
-    # def on_check_btn_clicked(self):
-    #     self.qti = QTimer()
-    #     self.qti.timeout.connect(self.aaa)
-    #     self.qti.start(500)
+    @pyqtSlot()
+    def on_check_btn_clicked(self):
+        image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
+        t = DisplayBuffer()
+        t.Copy(image)
+        a = conver_qimage2array(t.img)
+        run_model_method(a, "31_tool_knife.pth")
+        # cv2.imwrite("test.jpg", a)
+        # TIS.Imaging.FrameExtensions.SaveAsJpeg(image, "test.jpg", 75)
+        # print(image)
+        # img = cv2.imread("test.bmp")
+        # cv2.imwrite(f"C:/Users/smpss/kmol/mask_rcnn_pytorch/dataset/{self.count:02d}.jpg", img)
+        # self.count += 1
+        # self.qti = QTimer()
+        # self.qti.timeout.connect(self.aaa)
+        # self.qti.start(500)
 
     @pyqtSlot()
     def on_run_servo_clicked(self):
