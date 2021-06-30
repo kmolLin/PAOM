@@ -80,9 +80,9 @@ def showbbox(model, img):
             cv2.putText(img, 'mark_type_2', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
 
     # plt.figure(figsize=(20, 15))
-    cv2.namedWindow("test", cv2.WINDOW_NORMAL)
-    cv2.imshow("test", img)
-    cv2.waitKey(0)
+    # cv2.namedWindow("test", cv2.WINDOW_NORMAL)
+    # cv2.imshow("test", img)
+    # cv2.waitKey(0)
     # exit()
     return img
 
@@ -101,7 +101,8 @@ def run_model_method(img, modelpath):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     model.to(device)
-    showbbox(model, im_pil)
+    img = showbbox(model, im_pil)
+    return img
 
 
 if __name__ == "__main__":

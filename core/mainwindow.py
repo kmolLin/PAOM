@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
 __author__ = "Yu-Sheng Lin"
-__copyright__ = "Copyright (C) 2016-2020"
+__copyright__ = "Copyright (C) 2016-2022"
 __license__ = "AGPL"
 __email__ = "pyquino@gmail.com"
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from PyQt5.QtGui import QIcon
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSlot
-from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter, DisplayBuffer, conver_qimage2array
+from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter, \
+        DisplayBuffer, conver_qimage2array, Thread_scale_image
 from core.serial_core.serialportcontext import SerialPortContext
 from core.ai_detected.run_model import run_model_method
 
@@ -47,13 +49,16 @@ class MainWindow(QMainWindow):
         self.ic.LiveDisplay = True
         self.flag = True
         
-        self.test = Thread_wait_forController("C:/Users/smpss/kmol/Pyquino")
+        self.test = Thread_wait_forController()
         self.test_pixmap.connect(self.test.ttt)
 
         self.brain_focus = Thread_slect_focus(self.test)
-        self.test_pixmap.connect(self.brain_focus.ttt)
+        # self.test_pixmap.connect(self.brain_focus.ttt)
+
+        self.zoom_command = Thread_scale_image(self.test)
 
         self.test.laplacian_signal.connect(self.brain_focus.get_laplacin_value)
+        self.test.zoomcommand_signal.connect(self.zoom_command.get_image)
         self.count = 0
 
         self._serial_context_ = SerialPortContext(port="COM0", baud=0)
@@ -227,6 +232,12 @@ class MainWindow(QMainWindow):
             sb = self.textEditReceived2.verticalScrollBar()
             sb.setValue(sb.maximum())
 
+    def getclassifierimage(self, img):
+        height, width, channel = img.shape
+        bytesPerline = 3 * width
+        qImg = QImage(img.data, width, height, bytesPerline, QImage.Format_RGB888).rgbSwapped()
+        self.image2.setPixmap(QPixmap.fromImage(qImg).scaledToHeight(360))
+
     def SnapImage(self):
         '''
         Snap and save an image
@@ -236,12 +247,18 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_check_btn_clicked(self):
-        image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
-        t = DisplayBuffer()
-        t.Copy(image)
-        a = conver_qimage2array(t.img)
-        run_model_method(a, "31_tool_knife.pth")
+        self.zoom_command.classifier_img.connect(self.getclassifierimage)
+        self.zoom_command.use_ai_detected()
+        self.zoom_command.start()
+
+        # image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
+        # t = DisplayBuffer()
+        # t.Copy(image)
+        # a = conver_qimage2array(t.img)
+        # run_model_method(a, "31_tool_knife.pth")
         # cv2.imwrite("test.jpg", a)
+
+
         # TIS.Imaging.FrameExtensions.SaveAsJpeg(image, "test.jpg", 75)
         # print(image)
         # img = cv2.imread("test.bmp")

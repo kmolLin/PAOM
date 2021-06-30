@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from System import TimeSpan
 from core.serial_core.serialportcontext import SerialPortContext
-
+from core.ai_detected.run_model import run_model_method
 
 def converte_pixmap2array(dispBuffer):
 
@@ -83,13 +83,47 @@ class Thread_slect_focus(QThread):
         self.laplacian = laplacian
 
 
+class Thread_scale_image(QThread):
+    classifier_img = pyqtSignal(object)
+
+    def __init__(self, send_thread_handle, parent=None):
+        QThread.__init__(self, parent)
+        self.send_thread = send_thread_handle
+        self.image_arr = None
+        self.laplacian = None
+        self.waitSignal = False
+        self.use_ai = False
+
+    def use_ai_detected(self):
+        self.use_ai = True
+
+    def run(self):
+        for i in range(0, 181, 30):
+            self.send_thread.scale_command(i)
+            while True:
+                if self.waitSignal:
+                    if self.use_ai:
+                        detected_img = run_model_method(self.image_arr, "31_tool_knife.pth")
+                        self.classifier_img.emit(detected_img)
+                    # cv2.imwrite(f"tmp_img/autozoom/{i:02d}.jpg", self.image_arr)
+                    break
+                self.msleep(300)
+            self.waitSignal = False
+        for i in range(180, -1, -30):
+            self.send_thread.scale_command(i)
+
+    def get_image(self, image):
+        self.image_arr = image
+        self.waitSignal = True
+
+
 class Thread_wait_forController(QThread):
     lnc_signal = pyqtSignal(int)
     laplacian_signal = pyqtSignal(object, object)
+    zoomcommand_signal = pyqtSignal(object)
 
-    def __init__(self, folder, parent=None):
+    def __init__(self, parent=None):
         QThread.__init__(self, parent)
-        self.folder = folder
         self.flag = True
         self.t0 = 0
         self.image_arr = None
@@ -116,6 +150,11 @@ class Thread_wait_forController(QThread):
                 self.status_flag = False
                 self.staMode = False
                 i += 1
+
+    def scale_command(self, scale):
+        self.__test__send(self.serial_hadle, f"M280 P0 S{scale}")
+        self.msleep(500)
+        self.zoomcommand_signal.emit(self.image_arr)
     
     def ramps_command(self, move_distance):
         self.__test__send(self.serial_hadle, "G91")
