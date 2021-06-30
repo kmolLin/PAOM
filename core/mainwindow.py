@@ -258,7 +258,6 @@ class MainWindow(QMainWindow):
         # run_model_method(a, "31_tool_knife.pth")
         # cv2.imwrite("test.jpg", a)
 
-
         # TIS.Imaging.FrameExtensions.SaveAsJpeg(image, "test.jpg", 75)
         # print(image)
         # img = cv2.imread("test.bmp")
@@ -267,6 +266,15 @@ class MainWindow(QMainWindow):
         # self.qti = QTimer()
         # self.qti.timeout.connect(self.aaa)
         # self.qti.start(500)
+
+    @pyqtSlot()
+    def on_ai_detected_btn_clicked(self):
+        image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
+        t = DisplayBuffer()
+        t.Copy(image)
+        a = conver_qimage2array(t.img)
+        classifierimg = run_model_method(a, "31_tool_knife.pth")
+        self.getclassifierimage(classifierimg)
 
     @pyqtSlot()
     def on_run_servo_clicked(self):

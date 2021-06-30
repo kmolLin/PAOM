@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1319</width>
-    <height>678</height>
+    <width>1413</width>
+    <height>685</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -558,6 +558,19 @@
             </item>
            </layout>
           </widget>
+          <widget class="QPushButton" name="ai_detected_btn">
+           <property name="geometry">
+            <rect>
+             <x>350</x>
+             <y>390</y>
+             <width>62</width>
+             <height>19</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>ai detected</string>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -571,7 +584,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1319</width>
+     <width>1413</width>
      <height>19</height>
     </rect>
    </property>
