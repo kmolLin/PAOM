@@ -17,7 +17,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from System import TimeSpan
 from core.serial_core.serialportcontext import SerialPortContext
-from core.ai_detected.run_model import run_model_method
+from core.ai_detected.run_model import LoadAIModel
+
 
 def converte_pixmap2array(dispBuffer):
 
@@ -79,7 +80,6 @@ class Thread_slect_focus(QThread):
         self.image_arr = converte_pixmap2array(pixmap)
 
     def get_laplacin_value(self, image, laplacian):
-        print(laplacian)
         self.laplacian = laplacian
 
 
@@ -93,6 +93,7 @@ class Thread_scale_image(QThread):
         self.laplacian = None
         self.waitSignal = False
         self.use_ai = False
+        self.loadai = LoadAIModel("31_tool_knife.pth")
 
     def use_ai_detected(self):
         self.use_ai = True
@@ -103,7 +104,7 @@ class Thread_scale_image(QThread):
             while True:
                 if self.waitSignal:
                     if self.use_ai:
-                        detected_img = run_model_method(self.image_arr, "31_tool_knife.pth")
+                        detected_img = self.loadai.run_model_method(self.image_arr)
                         self.classifier_img.emit(detected_img)
                     # cv2.imwrite(f"tmp_img/autozoom/{i:02d}.jpg", self.image_arr)
                     break
@@ -181,8 +182,8 @@ class Thread_wait_forController(QThread):
         elif data.startswith("<Run|"):
             pass
 
-    def aaa(self):
-        self.__test__send(self.serial_hadle, "?")
+    # def aaa(self):
+    #     self.__test__send(self.serial_hadle, "?")
 
     def motion(self, motion1: list):
         self.motion_step = motion1
@@ -190,7 +191,7 @@ class Thread_wait_forController(QThread):
     def get_serial_handle(self, serial_handle):
         self.serial_hadle = serial_handle
 
-    def ttt(self, pixmap):
+    def inputimage(self, pixmap):
         self.image_arr = converte_pixmap2array(pixmap)
         # print(pixmap)
 

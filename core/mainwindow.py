@@ -14,7 +14,7 @@ from PyQt5.QtCore import pyqtSlot
 from .classes import Thread_wait_forController, Thread_slect_focus, DisplayFilter, \
         DisplayBuffer, conver_qimage2array, Thread_scale_image
 from core.serial_core.serialportcontext import SerialPortContext
-from core.ai_detected.run_model import run_model_method
+from core.ai_detected.run_model import LoadAIModel
 
 import numpy as np
 import math
@@ -48,21 +48,22 @@ class MainWindow(QMainWindow):
         # Create the sink for snapping images on demand.
         self.ic.LiveDisplay = True
         self.flag = True
+        self.loadai = None
         
-        self.test = Thread_wait_forController()
-        self.test_pixmap.connect(self.test.ttt)
+        self.wait_controler = Thread_wait_forController()
+        self.test_pixmap.connect(self.wait_controler.inputimage)
 
-        self.brain_focus = Thread_slect_focus(self.test)
+        self.brain_focus = Thread_slect_focus(self.wait_controler)
         # self.test_pixmap.connect(self.brain_focus.ttt)
 
-        self.zoom_command = Thread_scale_image(self.test)
+        self.zoom_command = Thread_scale_image(self.wait_controler)
 
-        self.test.laplacian_signal.connect(self.brain_focus.get_laplacin_value)
-        self.test.zoomcommand_signal.connect(self.zoom_command.get_image)
+        self.wait_controler.laplacian_signal.connect(self.brain_focus.get_laplacin_value)
+        self.wait_controler.zoomcommand_signal.connect(self.zoom_command.get_image)
         self.count = 0
 
         self._serial_context_ = SerialPortContext(port="COM0", baud=0)
-        self._receive_signal.connect(self.test.test_received)
+        self._receive_signal.connect(self.wait_controler.test_received)
 
         # test for for the form
         # self.image_btn.setIcon(QIcon("images/control_xy.png"))
@@ -205,7 +206,7 @@ class MainWindow(QMainWindow):
                 self._serial_context_.recall()
                 self._serial_context_.registerReceivedCallback(self.__data_received__)
                 self._serial_context_.open()
-                self.test.get_serial_handle(self._serial_context_)
+                self.wait_controler.get_serial_handle(self._serial_context_)
                 # start the the button
                 self._serial_button_Setting()
                 self.run_servo.setEnabled(True)
@@ -263,17 +264,15 @@ class MainWindow(QMainWindow):
         # img = cv2.imread("test.bmp")
         # cv2.imwrite(f"C:/Users/smpss/kmol/mask_rcnn_pytorch/dataset/{self.count:02d}.jpg", img)
         # self.count += 1
-        # self.qti = QTimer()
-        # self.qti.timeout.connect(self.aaa)
-        # self.qti.start(500)
 
     @pyqtSlot()
     def on_ai_detected_btn_clicked(self):
         image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
         t = DisplayBuffer()
         t.Copy(image)
-        a = conver_qimage2array(t.img)
-        classifierimg = run_model_method(a, "31_tool_knife.pth")
+        if self.loadai is None:
+            self.loadai = LoadAIModel("31_tool_knife.pth")
+        classifierimg = self.loadai.run_model_method(conver_qimage2array(t.img))
         self.getclassifierimage(classifierimg)
 
     @pyqtSlot()

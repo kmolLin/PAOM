@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1413</width>
-    <height>685</height>
+    <width>1457</width>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,18 +18,28 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="image1">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="image2">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QLabel" name="image1">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="image2">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="test">
@@ -584,7 +594,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1413</width>
+     <width>1457</width>
      <height>19</height>
     </rect>
    </property>
