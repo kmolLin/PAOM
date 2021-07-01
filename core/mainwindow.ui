@@ -250,7 +250,7 @@
                <string/>
               </property>
               <property name="icon">
-               <iconset>
+               <iconset resource="../images/icon.qrc">
                 <normaloff>:/icon/arrow_right_down.png</normaloff>:/icon/arrow_right_down.png</iconset>
               </property>
               <property name="iconSize">
@@ -465,7 +465,7 @@
                    <number>0</number>
                   </property>
                   <property name="value">
-                   <number>200</number>
+                   <number>100</number>
                   </property>
                  </widget>
                 </item>
@@ -495,11 +495,29 @@
             <rect>
              <x>10</x>
              <y>10</y>
-             <width>309</width>
+             <width>371</width>
              <height>80</height>
             </rect>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QComboBox" name="com_comboBox">
+              <item>
+               <property name="text">
+                <string>COM4</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="serial_comboBox">
+              <item>
+               <property name="text">
+                <string>115200</string>
+               </property>
+              </item>
+             </widget>
+            </item>
             <item>
              <widget class="QPushButton" name="test_focus_btn">
               <property name="text">

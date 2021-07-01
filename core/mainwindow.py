@@ -200,8 +200,8 @@ class MainWindow(QMainWindow):
             self._serial_context_.close()
         else:
             try:
-                port = "COM4"
-                baud = 115200
+                port = self.com_comboBox.currentText()
+                baud = int(self.serial_comboBox.currentText())
                 self._serial_context_ = SerialPortContext(port=port, baud=baud)
                 self._serial_context_.recall()
                 self._serial_context_.registerReceivedCallback(self.__data_received__)
