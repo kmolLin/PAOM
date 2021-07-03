@@ -146,7 +146,6 @@ class MainWindow(QMainWindow):
                 z = f"{tmps1[btn] * self.stepbox.value()}"
                 f = self.feedbox.value()
                 data = f"G91\nG1Z{z}F{f}\nG90\nM114\n"
-                print(data)
                 self.__test__send(data)
             return dynamic
 
