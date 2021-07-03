@@ -134,11 +134,26 @@ class MainWindow(QMainWindow):
             btn.setEnabled(True)
             f = make_func_home(btn)
             btn.clicked.connect(f)
-        # self.xAxisrigh
-        # self.right_down
-        # self.yAxisdown
-        # self.left_down
-        # self.xAxisleft
+
+        tmps1 = {
+            self.zupButton: 1,
+            self.zdownButton: 1
+        }
+
+        def make_z_move(btn):
+            @pyqtSlot()
+            def dynamic():
+                z = f"{tmps1[btn] * self.stepbox.value()}"
+                f = self.feedbox.value()
+                data = f"G91\nG1Z{z}F{f}\nG90\nM114\n"
+                print(data)
+                self.__test__send(data)
+            return dynamic
+
+        for i, btn in enumerate(tmps1):
+            btn.setEnabled(True)
+            f = make_z_move(btn)
+            btn.clicked.connect(f)
 
     # @pyqtSlot()
     # def on_left_up_cliecked(self):
