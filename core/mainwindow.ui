@@ -504,6 +504,11 @@
              <widget class="QComboBox" name="com_comboBox">
               <item>
                <property name="text">
+                <string>COM6</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
                 <string>COM3</string>
                </property>
               </item>

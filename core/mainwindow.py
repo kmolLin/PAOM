@@ -83,6 +83,7 @@ class MainWindow(QMainWindow):
     def finff(self):
         print("finished")
 
+
     def __init_setting(self):
         # Load IC Imaging Control .NET
         # Import the IC Imaging Control namespace.
@@ -126,7 +127,7 @@ class MainWindow(QMainWindow):
         def make_func_home(btn):
             @pyqtSlot()
             def d():
-                data = f"G28 {tmps[btn]}0\nM114\n"
+                data = f"G28 {tmps[btn]}0\n"
                 self.__test__send(data)
             return d
 
@@ -137,7 +138,7 @@ class MainWindow(QMainWindow):
 
         tmps1 = {
             self.zupButton: 1,
-            self.zdownButton: 1
+            self.zdownButton: -1
         }
 
         def make_z_move(btn):
@@ -153,9 +154,6 @@ class MainWindow(QMainWindow):
             btn.setEnabled(True)
             f = make_z_move(btn)
             btn.clicked.connect(f)
-
-    # @pyqtSlot()
-    # def on_left_up_cliecked(self):
 
     def _add_action(self):
         # Create the menu
@@ -225,6 +223,9 @@ class MainWindow(QMainWindow):
                 self._serial_button_Setting()
                 self.run_servo.setEnabled(True)
                 self.servo_slider.setEnabled(True)
+                time.sleep(2)
+                self.ttmp = "123"
+                # self.__test__send("M928")
             except :
                 pass
                 # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
@@ -237,7 +238,7 @@ class MainWindow(QMainWindow):
         data = str(data1 + '\n')
         if self._serial_context_.isRunning():
             if len(data) > 0:
-                print(data)
+                # print(data)
                 self._serial_context_.send(data, 0)
 
     def __data_received__(self, data):
@@ -246,6 +247,15 @@ class MainWindow(QMainWindow):
             self.textEditReceived2.insertPlainText(data[c])
             sb = self.textEditReceived2.verticalScrollBar()
             sb.setValue(sb.maximum())
+
+        if data.startswith("y_min"):
+            if "open" in data:
+                pass
+            else:
+                print("trigged")
+            # if self.ttmp != data.split("\n")[2]:
+            #     self.ttmp = data.split("\n")[2]
+            #     print("Hey")
 
     def getclassifierimage(self, img):
         height, width, channel = img.shape
@@ -260,11 +270,27 @@ class MainWindow(QMainWindow):
         image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
         TIS.Imaging.FrameExtensions.SaveAsBitmap(image, "test.bmp")
 
+    def gogo_test(self):
+        self.__test__send("G28 Y0")
+        self.__test__send("G28 X0")
+        self.__test__send("G28 Z0")
+
+        tmp = [(0, 0, 0), (30, 0, 0), (30, 30, 0), (30, 30, 30), (0, 30, 0), (0, 30, 30), (0, 0, 30), (30, 0, 30)
+            , (30, 30, 30)]
+        for x, y, z in tmp:
+            self.__test__send(f"G1X{x}Y{y}Z{z}F600\nM114\n")
+            time.sleep(0.5)
+
+
     @pyqtSlot()
     def on_check_btn_clicked(self):
-        self.zoom_command.classifier_img.connect(self.getclassifierimage)
-        self.zoom_command.use_ai_detected()
-        self.zoom_command.start()
+        self.qti = QTimer(self)
+        self.qti.timeout.connect(self.gogo_test)
+        self.qti.start(35000)
+
+        # self.zoom_command.classifier_img.connect(self.getclassifierimage)
+        # self.zoom_command.use_ai_detected()
+        # self.zoom_command.start()
 
         # image = self.snapsink.SnapSingle(TimeSpan.FromSeconds(1))
         # t = DisplayBuffer()
@@ -292,7 +318,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_run_servo_clicked(self):
         value = self.servo_spin.value()
-        self.__test__send(f"M280 P0 S{value}")
+        self.__test__send(f"M998 P0 S{value}")
 
     def sldDisconnect(self):
         self.sender().valueChanged.disconnect()
