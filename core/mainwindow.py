@@ -223,9 +223,7 @@ class MainWindow(QMainWindow):
                 self._serial_button_Setting()
                 self.run_servo.setEnabled(True)
                 self.servo_slider.setEnabled(True)
-                time.sleep(2)
                 self.ttmp = "123"
-                # self.__test__send("M928")
             except :
                 pass
                 # QMessageBox.critical(self, f"error", u"can't open the comport,please check!")
@@ -271,22 +269,34 @@ class MainWindow(QMainWindow):
         TIS.Imaging.FrameExtensions.SaveAsBitmap(image, "test.bmp")
 
     def gogo_test(self):
-        self.__test__send("G28 Y0")
-        self.__test__send("G28 X0")
-        self.__test__send("G28 Z0")
+        if self.total <= 10:
+            # self.__test__send("G28 Y0")
+            self.__test__send("G28 X0")
+            self.__test__send("G28 Y0")
+            self.__test__send("G28 Z0")
+            self.__test__send(f"G1X0Y85Z0F600\nM114\n")
+            self.__test__send(f"G1X45Y85Z0F600\nM114\n")
+            self.__test__send(f"G1X45Y85Z50F600\nM114\n")
+        else:
+            self.qti.stop()
+        self.total += 1
 
-        tmp = [(0, 0, 0), (30, 0, 0), (30, 30, 0), (30, 30, 30), (0, 30, 0), (0, 30, 30), (0, 0, 30), (30, 0, 30)
-            , (30, 30, 30)]
-        for x, y, z in tmp:
-            self.__test__send(f"G1X{x}Y{y}Z{z}F600\nM114\n")
-            time.sleep(0.5)
+
+        # self.__test__send("G28 Z0")
+
+        # tmp = [(0, 0, 0), (30, 0, 0), (30, 30, 0), (30, 30, 30), (0, 30, 0), (0, 30, 30), (0, 0, 30), (30, 0, 30)
+        #     , (30, 30, 30)]
+        # for x, y, z in tmp:
+        #     self.__test__send(f"G1X{x}Y{y}Z{z}F600\nM114\n")
+        #     time.sleep(0.5)
 
 
     @pyqtSlot()
     def on_check_btn_clicked(self):
         self.qti = QTimer(self)
         self.qti.timeout.connect(self.gogo_test)
-        self.qti.start(35000)
+        self.qti.start(10000)
+        self.total = 0
 
         # self.zoom_command.classifier_img.connect(self.getclassifierimage)
         # self.zoom_command.use_ai_detected()
