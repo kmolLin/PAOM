@@ -52,6 +52,8 @@ class Thread_slect_focus(QThread):
         self.send_thread = send_thread_handle
         self.image_arr = None
         self.laplacian = None
+        self.commads = ["G28 X0\n", "G28 Y0\n", "G28 Z0\n",
+                        "G1X9.0Y95.0Z26.0F300\nM114\n"]
 
     def run(self):
         # while i < 20:
@@ -59,19 +61,38 @@ class Thread_slect_focus(QThread):
         # self.send_thread.motion_step = [-15]
         # self.send_thread.start()
         # self.send_thread.wait()
-        cnt = 0
-        tmp = 0
-        best_locate = 0
+        # X:9.0 Y95.0 Z5.0   Z->26 5
+        # G28 X0
+        # G28 Y0
+        # G28 Z0
+        # G1X9.0Y95.0Z26.0F300
         tmp = []
-        while cnt < 15:
 
-            self.send_thread.motion_step = [10]
+        self.send_thread.motion_step = self.commads
+        self.send_thread.start()
+        self.send_thread.wait()
+
+        for i in range(21):
+            cmd = [f"G1X9.0Y95.0Z{26 - i}F300\nM114\n"]
+            self.send_thread.motion_step = cmd
             self.send_thread.start()
             self.send_thread.wait()
             tmp.append(self.laplacian)
-            cnt = cnt + 1
 
-            self.msleep(100)
+        # best_locate in detected knife
+        cmd = [f"G1X9.0Y95.0Z{26 - tmp.index(max(tmp))}F300\nM114\n"]
+        self.send_thread.motion_step = cmd
+        self.send_thread.start()
+        self.send_thread.wait()
+        # while cnt < 15:
+        #
+        #     self.send_thread.motion_step = [10]
+        #     self.send_thread.start()
+        #     self.send_thread.wait()
+        #     tmp.append(self.laplacian)
+        #     cnt = cnt + 1
+        #
+        #     self.msleep(100)
         # self.send_thread.motion_step = [tmp.index(max(tmp)) - 15]
         # self.send_thread.start()
         # self.send_thread.wait()
@@ -81,6 +102,7 @@ class Thread_slect_focus(QThread):
 
     def get_laplacin_value(self, image, laplacian):
         self.laplacian = laplacian
+        print(laplacian)
 
 
 class Thread_scale_image(QThread):
@@ -153,15 +175,17 @@ class Thread_wait_forController(QThread):
                 i += 1
 
     def scale_command(self, scale):
-        self.__test__send(self.serial_hadle, f"M280 P0 S{scale}")
+        self.__test__send(self.serial_hadle, f"M998 P0 S{scale}")
         self.msleep(500)
         self.zoomcommand_signal.emit(self.image_arr)
     
-    def ramps_command(self, move_distance):
-        self.__test__send(self.serial_hadle, "G91")
-        self.__test__send(self.serial_hadle, f"G1 Y{move_distance} F500")
-        self.__test__send(self.serial_hadle, "G90")
-        self.__test__send(self.serial_hadle, "M114")
+    def ramps_command(self, command):
+
+        # self.__test__send(self.serial_hadle, "G91")
+        # self.__test__send(self.serial_hadle, f"G1 Y{move_distance} F500")
+        # self.__test__send(self.serial_hadle, "G90")
+        # self.__test__send(self.serial_hadle, "M114")
+        self.__test__send(self.serial_hadle, command)
         self.staMode = True
 
     def __test__send(self, contex, data1):
@@ -172,12 +196,13 @@ class Thread_wait_forController(QThread):
 
     def test_received(self, data):
         if data.startswith("echo:busy") or self.staMode:
-            print(data)
             if data.startswith("X:"):
-                print(data)
+                # print(data)
                 # x, y, z = data.split("|")[1].split(":")[1].split(",")
                 # print(f"X:{x} Y:{y} Z:{z}")
                 self.status_flag = True
+            # self.sleep(5000)
+            # self.status_flag = True
 
         elif data.startswith("<Run|"):
             pass

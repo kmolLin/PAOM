@@ -282,6 +282,7 @@ class MainWindow(QMainWindow):
         self.total += 1
 
 
+        # detected locate : X:9.0 Y95.0 Z5.0   Z->26 5
         # self.__test__send("G28 Z0")
 
         # tmp = [(0, 0, 0), (30, 0, 0), (30, 30, 0), (30, 30, 30), (0, 30, 0), (0, 30, 30), (0, 0, 30), (30, 0, 30)
