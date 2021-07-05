@@ -53,7 +53,7 @@ class MainWindow(QMainWindow):
         self.wait_controler = Thread_wait_forController()
         self.test_pixmap.connect(self.wait_controler.inputimage)
 
-        self.brain_focus = Thread_slect_focus(self.wait_controler)
+        self.brain_focus = Thread_slect_focus(self.wait_controler, use_ai=True)
         # self.test_pixmap.connect(self.brain_focus.ttt)
 
         self.zoom_command = Thread_scale_image(self.wait_controler)
@@ -193,6 +193,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_automode_btn_clicked(self):
         self.brain_focus.start()
+        self.brain_focus.classifier_img.connect(self.getclassifierimage)
 
     def gogo_run(self, image, laplacian_value):
         # test func

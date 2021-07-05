@@ -70,7 +70,7 @@ class LoadAIModel:
         mask = mask.astype("uint8")
 
         for i in range(prediction[0]['boxes'].cpu().shape[0]):
-            if prediction[0]['scores'][i] < 0.2:
+            if prediction[0]['scores'][i] < 0.9:
                 continue
             xmin = round(prediction[0]['boxes'][i][0].item())
             ymin = round(prediction[0]['boxes'][i][1].item())
@@ -79,14 +79,15 @@ class LoadAIModel:
             label = prediction[0]['labels'][i].item()
             mm = mask[i][0]
             contours, hierarchy = cv2.findContours(mm, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            scores = prediction[0]['scores'][i]
             # Draw contours:
             if label == 1:
-                cv2.drawContours(img, contours, -1, (0, 255, 0), 1)
-                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
-                cv2.putText(img, 'mark_type_1', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0))
+                cv2.drawContours(img, contours, -1, (0, 0, 255), 3)
+                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 4)
+                cv2.putText(img, f'{scores:.3f}', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (255, 255, 0), 5)
             elif label == 2:
                 cv2.drawContours(img, contours, -1, (0, 0, 255), 1)
-                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 4)
                 cv2.putText(img, 'mark_type_2', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
 
         return img

@@ -46,21 +46,20 @@ def conver_qimage2array(img: QImage):
 
 
 class Thread_slect_focus(QThread):
+    classifier_img = pyqtSignal(object)
 
-    def __init__(self, send_thread_handle, parent=None):
+    def __init__(self, send_thread_handle, use_ai=False,parent=None):
         QThread.__init__(self, parent)
         self.send_thread = send_thread_handle
         self.image_arr = None
         self.laplacian = None
         self.commads = ["G28 X0\n", "G28 Y0\n", "G28 Z0\n",
                         "G1X9.0Y95.0Z26.0F300\nM114\n"]
+        self.loadai = LoadAIModel("31_tool_knife.pth")
+        self.use_ai = use_ai
 
     def run(self):
-        # while i < 20:
-        step = 15
-        # self.send_thread.motion_step = [-15]
-        # self.send_thread.start()
-        # self.send_thread.wait()
+        # Notice command need [command] list type
         # X:9.0 Y95.0 Z5.0   Z->26 5
         # G28 X0
         # G28 Y0
@@ -78,6 +77,9 @@ class Thread_slect_focus(QThread):
             self.send_thread.start()
             self.send_thread.wait()
             tmp.append(self.laplacian)
+            if self.use_ai and self.laplacian > 10:
+                detected_img = self.loadai.run_model_method(self.image_arr)
+                self.classifier_img.emit(detected_img)
 
         # best_locate in detected knife
         cmd = [f"G1X9.0Y95.0Z{26 - tmp.index(max(tmp))}F300\nM114\n"]
@@ -102,7 +104,8 @@ class Thread_slect_focus(QThread):
 
     def get_laplacin_value(self, image, laplacian):
         self.laplacian = laplacian
-        print(laplacian)
+        self.image_arr = image
+        # print(laplacian)
 
 
 class Thread_scale_image(QThread):
