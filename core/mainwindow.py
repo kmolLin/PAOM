@@ -281,7 +281,6 @@ class MainWindow(QMainWindow):
             self.qti.stop()
         self.total += 1
 
-
         # detected locate : X:9.0 Y95.0 Z5.0   Z->26 5
         # self.__test__send("G28 Z0")
 
