@@ -202,9 +202,8 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_machine_home_btn_clicked(self):
         self.__test__send("G28 Y0")
-        self.__test__send("G91")
-        self.__test__send("G1 Y20 F500")
-        self.__test__send("G90")
+        self.__test__send("G28 X0")
+        self.__test__send("G28 Z0")
         self.__test__send("M114")
 
     @pyqtSlot()
