@@ -246,6 +246,15 @@ class MainWindow(QMainWindow):
             sb = self.textEditReceived2.verticalScrollBar()
             sb.setValue(sb.maximum())
 
+        # parser M114 X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0
+        if data.startswith("X:"):
+            x = data.split(" ")[0].split(":")[-1]
+            y = data.split(" ")[1].split(":")[-1]
+            z = data.split(" ")[2].split(":")[-1]
+            self.x_lcdNumber.display(x)
+            self.y_lcdNumber.display(y)
+            self.z_lcdNumber.display(z)
+
         if data.startswith("y_min"):
             if "open" in data:
                 pass

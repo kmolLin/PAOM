@@ -60,7 +60,7 @@ class Thread_slect_focus(QThread):
 
     def run(self):
         # Notice command need [command] list type
-        # X:9.0 Y95.0 Z5.0   Z->26 5
+        # X:9.0 Y95.0 Z5.0   Z->26 -> 5
         # G28 X0
         # G28 Y0
         # G28 Z0
