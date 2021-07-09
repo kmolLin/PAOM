@@ -70,7 +70,7 @@ class LoadAIModel:
         mask = mask.astype("uint8")
 
         for i in range(prediction[0]['boxes'].cpu().shape[0]):
-            if prediction[0]['scores'][i] < 0.9:
+            if prediction[0]['scores'][i] < 0.5:
                 continue
             xmin = round(prediction[0]['boxes'][i][0].item())
             ymin = round(prediction[0]['boxes'][i][1].item())

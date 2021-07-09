@@ -628,6 +628,9 @@
               </item>
               <item>
                <widget class="QLCDNumber" name="x_lcdNumber">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="value" stdset="0">
                  <double>0.000000000000000</double>
                 </property>
