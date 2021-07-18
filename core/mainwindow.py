@@ -198,7 +198,24 @@ class MainWindow(QMainWindow):
     def gogo_run(self, image, laplacian_value):
         # test func
         self.__test__send("G28 Y0")
-        
+
+    @pyqtSlot()
+    def on_move_btn_posstive_clicked(self):
+        value = self.rotate_spinbox.value()
+        f = 2000
+        data = f"G91\nG1E{value}F{f}\nG90\nM114\n"
+        self.__test__send(data)
+        # G0
+        # E0
+        # F1000
+
+    @pyqtSlot()
+    def on_move_btn_negtive_clicked(self):
+        value = self.rotate_spinbox.value()
+        f = 2000
+        data = f"G91\nG1E-{value}F{f}\nG90\nM114\n"
+        self.__test__send(data)
+
     @pyqtSlot()
     def on_machine_home_btn_clicked(self):
         self.__test__send("G28 Y0")
@@ -251,9 +268,11 @@ class MainWindow(QMainWindow):
             x = data.split(" ")[0].split(":")[-1]
             y = data.split(" ")[1].split(":")[-1]
             z = data.split(" ")[2].split(":")[-1]
+            e = data.split(" ")[3].split(":")[-1]
             self.x_lcdNumber.display(x)
             self.y_lcdNumber.display(y)
             self.z_lcdNumber.display(z)
+            self.rotate_lcd.display(e)
 
         if data.startswith("y_min"):
             if "open" in data:

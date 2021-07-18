@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1457</width>
-    <height>731</height>
+    <height>716</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,7 +49,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>410</y>
+             <y>430</y>
              <width>331</width>
              <height>191</height>
             </rect>
@@ -59,7 +59,7 @@
            <property name="geometry">
             <rect>
              <x>350</x>
-             <y>360</y>
+             <y>350</y>
              <width>62</width>
              <height>19</height>
             </rect>
@@ -600,7 +600,7 @@
            <property name="geometry">
             <rect>
              <x>350</x>
-             <y>390</y>
+             <y>380</y>
              <width>62</width>
              <height>19</height>
             </rect>
@@ -614,8 +614,8 @@
             <rect>
              <x>390</x>
              <y>10</y>
-             <width>160</width>
-             <height>89</height>
+             <width>261</width>
+             <height>81</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -641,39 +641,104 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Y</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLCDNumber" name="y_lcdNumber"/>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_9">
+                  <item>
+                   <widget class="QLabel" name="label_4">
+                    <property name="text">
+                     <string>Z</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLCDNumber" name="z_lcdNumber"/>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
               <item>
-               <widget class="QLabel" name="label_3">
+               <widget class="QLabel" name="label_8">
                 <property name="text">
-                 <string>Y</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
+                 <string>Rotate</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLCDNumber" name="y_lcdNumber"/>
+               <widget class="QLCDNumber" name="rotate_lcd"/>
               </item>
              </layout>
             </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="verticalLayoutWidget_2">
+           <property name="geometry">
+            <rect>
+             <x>490</x>
+             <y>350</y>
+             <width>160</width>
+             <height>80</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
               <item>
-               <widget class="QLabel" name="label_4">
+               <widget class="QLabel" name="label_5">
                 <property name="text">
-                 <string>Z</string>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
+                 <string>Rotate Axis</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLCDNumber" name="z_lcdNumber"/>
+               <widget class="QDoubleSpinBox" name="rotate_spinbox">
+                <property name="maximum">
+                 <double>2000.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>100.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <item>
+               <widget class="QPushButton" name="move_btn_posstive">
+                <property name="text">
+                 <string>+</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="move_btn_negtive">
+                <property name="text">
+                 <string>-</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
