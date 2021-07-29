@@ -309,15 +309,13 @@ class MainWindow(QMainWindow):
             self.qti.stop()
         self.total += 1
 
-        # detected locate : X:9.0 Y95.0 Z5.0   Z->26 5
-        # self.__test__send("G28 Z0")
+    @pyqtSlot()
+    def on_save_locate_btn_clicked(self):
+        x, y, z = self.x_lcdNumber.value(), self.y_lcdNumber.value(), self.z_lcdNumber.value()
 
-        # tmp = [(0, 0, 0), (30, 0, 0), (30, 30, 0), (30, 30, 30), (0, 30, 0), (0, 30, 30), (0, 0, 30), (30, 0, 30)
-        #     , (30, 30, 30)]
-        # for x, y, z in tmp:
-        #     self.__test__send(f"G1X{x}Y{y}Z{z}F600\nM114\n")
-        #     time.sleep(0.5)
-
+        f = open("memory_locate.txt", "w")
+        f.write(f"{x},{y},{z}")
+        f.close()
 
     @pyqtSlot()
     def on_check_btn_clicked(self):
