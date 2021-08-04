@@ -314,8 +314,9 @@ class MainWindow(QMainWindow):
         x, y, z = self.x_lcdNumber.value(), self.y_lcdNumber.value(), self.z_lcdNumber.value()
 
         f = open("memory_locate.txt", "w")
-        f.write(f"X:{x},Y:{y},Z:{z}")
+        f.write(f"X:{x},Y:{y},Z:{z}\n")
         f.close()
+
 
     @pyqtSlot()
     def on_check_btn_clicked(self):
