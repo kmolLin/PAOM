@@ -478,6 +478,11 @@
            <widget class="QComboBox" name="com_comboBox">
             <item>
              <property name="text">
+              <string>COM4</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>COM7</string>
              </property>
             </item>
@@ -709,7 +714,7 @@
           <rect>
            <x>490</x>
            <y>370</y>
-           <width>160</width>
+           <width>197</width>
            <height>80</height>
           </rect>
          </property>
@@ -811,7 +816,7 @@
           <rect>
            <x>490</x>
            <y>470</y>
-           <width>203</width>
+           <width>219</width>
            <height>80</height>
           </rect>
          </property>
@@ -847,7 +852,7 @@
      <x>0</x>
      <y>0</y>
      <width>1400</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

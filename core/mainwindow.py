@@ -320,6 +320,7 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def on_check_btn_clicked(self):
+        """設定"""
         self.qti = QTimer(self)
         self.qti.timeout.connect(self.gogo_test)
         self.qti.start(10000)

@@ -109,6 +109,7 @@ class Thread_slect_focus(QThread):
 
 
 class Thread_scale_image(QThread):
+    """這邊會透過設計AI用來進行自動辨識"""
     classifier_img = pyqtSignal(object)
 
     def __init__(self, send_thread_handle, parent=None):
