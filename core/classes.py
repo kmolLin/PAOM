@@ -53,8 +53,8 @@ class Thread_slect_focus(QThread):
         self.send_thread = send_thread_handle
         self.image_arr = None
         self.laplacian = None
-        self.commads = ["G28 X0\n", "G28 Y0\n", "G28 Z0\n",
-                        "G1X9.0Y95.0Z26.0F300\nM114\n"]
+        # self.commads = ["G28 X0\n", "G28 Y0\n", "G28 Z0\n",
+        #                 "G1X9.0Y95.0Z26.0F300\nM114\n"]
         self.loadai = LoadAIModel("31_tool_knife.pth")
         self.use_ai = use_ai
 
@@ -67,25 +67,34 @@ class Thread_slect_focus(QThread):
         # G1X9.0Y95.0Z26.0F300
         tmp = []
 
-        self.send_thread.motion_step = self.commads
-        self.send_thread.start()
-        self.send_thread.wait()
-
-        for i in range(21):
-            cmd = [f"G1X9.0Y95.0Z{26 - i}F300\nM114\n"]
-            self.send_thread.motion_step = cmd
+        # self.send_thread.motion_step = self.commads
+        # self.send_thread.start()
+        # self.send_thread.wait()
+        
+        for i in range(100):
+            data = f"G91\nG1E1F{2000}\nG90\nM114\n"
+            # print(data)
+            self.send_thread.motion_step = [data]
             self.send_thread.start()
             self.send_thread.wait()
-            tmp.append(self.laplacian)
-            if self.use_ai and self.laplacian > 10:
-                detected_img = self.loadai.run_model_method(self.image_arr)
-                self.classifier_img.emit(detected_img)
+            cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/{i}.bmp", self.image_arr)
+            self.msleep(200)
+
+        # for i in range(21):
+        #     cmd = [f"G1X9.0Y95.0Z{26 - i}F300\nM114\n"]
+        #     self.send_thread.motion_step = cmd
+        #     self.send_thread.start()
+        #     self.send_thread.wait()
+        #     tmp.append(self.laplacian)
+        #     if self.use_ai and self.laplacian > 10:
+        #         detected_img = self.loadai.run_model_method(self.image_arr)
+        #         self.classifier_img.emit(detected_img)
 
         # best_locate in detected knife
-        cmd = [f"G1X9.0Y95.0Z{26 - tmp.index(max(tmp))}F300\nM114\n"]
-        self.send_thread.motion_step = cmd
-        self.send_thread.start()
-        self.send_thread.wait()
+        # cmd = [f"G1X9.0Y95.0Z{26 - tmp.index(max(tmp))}F300\nM114\n"]
+        # self.send_thread.motion_step = cmd
+        # self.send_thread.start()
+        # self.send_thread.wait()
         # while cnt < 15:
         #
         #     self.send_thread.motion_step = [10]
