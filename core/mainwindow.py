@@ -205,9 +205,6 @@ class MainWindow(QMainWindow):
         f = 2000
         data = f"G91\nG1E{value}F{f}\nG90\nM114\n"
         self.__test__send(data)
-        # G0
-        # E0
-        # F1000
 
     @pyqtSlot()
     def on_move_btn_negtive_clicked(self):
