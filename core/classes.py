@@ -71,13 +71,13 @@ class Thread_slect_focus(QThread):
         # self.send_thread.start()
         # self.send_thread.wait()
         
-        for i in range(100):
-            data = f"G91\nG1E1F{2000}\nG90\nM114\n"
+        for i in range(300):
+            data = f"G91\nG1E1F{1000}\nG90\nM114\n"
             # print(data)
             self.send_thread.motion_step = [data]
             self.send_thread.start()
             self.send_thread.wait()
-            cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/{i}.bmp", self.image_arr)
+            cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/new_tool/{i}.bmp", self.image_arr)
             self.msleep(200)
 
         # for i in range(21):
