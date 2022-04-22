@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
         self.test_pixmap.connect(self.wait_controler.inputimage)
 
         self.brain_focus = Thread_slect_focus(self.wait_controler, use_ai=True)
-        # self.test_pixmap.connect(self.brain_focus.ttt)
+        self.test_pixmap.connect(self.brain_focus.ttt)
 
         self.zoom_command = Thread_scale_image(self.wait_controler)
 

@@ -136,3 +136,4 @@ dmypy.json
 # pytorch AI model
 *.pth
 *.pt
+/Frame_queue_link
