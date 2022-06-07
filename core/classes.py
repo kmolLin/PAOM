@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from System import TimeSpan
 from core.serial_core.serialportcontext import SerialPortContext
+from core.template_matching import loadimage_process
 from core.ai_detected.run_model import LoadAIModel
 
 
@@ -67,18 +68,37 @@ class Thread_slect_focus(QThread):
         # G1X9.0Y95.0Z26.0F300
         tmp = []
 
+        # test for continue get image from array
+        data = f"G91\nG1E1000F{1000}\nG90\nM114\n"
+        self.send_thread.motion_step = [data]
+        self.send_thread.start()
+        self.msleep(200)
+        t = time.localtime()
+        current_time = time.strftime("%Y_%m_%d_%H_%M_%S", t)
+        folder_path = f"C:/Users/smpss/kmol/save_img_experiment/{current_time}"
+        os.mkdir(folder_path)
+        for i in range(300):
+            cv2.imwrite(f"{folder_path}/{i:03d}.bmp", self.image_arr)
+            self.msleep(200)
+
+        files = os.listdir(folder_path)
+        files.sort(key=lambda x: os.path.getmtime(f"{folder_path}/{x}"))
+        merge_padding = 20
+
+        result = loadimage_process(folder_path, files, merge_padding, len(files), select=1, image_perline=0)
+        cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/template_matching_merge/{current_time}.jpg", result)
         # self.send_thread.motion_step = self.commads
         # self.send_thread.start()
         # self.send_thread.wait()
-        
-        for i in range(300):
-            data = f"G91\nG1E5F{1000}\nG90\nM114\n"
-            # print(data)
-            # self.send_thread.motion_step = [data]
-            # self.send_thread.start()
-            # self.send_thread.wait()
-            cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/new_tool/{i}.bmp", self.image_arr)
-            self.msleep(200)
+        #
+        # for i in range(300):
+        #     data = f"G91\nG1E5F{1000}\nG90\nM114\n"
+        #     # print(data)
+        #     # self.send_thread.motion_step = [data]
+        #     # self.send_thread.start()
+        #     # self.send_thread.wait()
+        #     cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/new_tool/{i}.bmp", self.image_arr)
+        #     self.msleep(200)
 
         # for i in range(21):
         #     cmd = [f"G1X9.0Y95.0Z{26 - i}F300\nM114\n"]
