@@ -496,6 +496,11 @@
               <string>COM3</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>COM5</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>
@@ -814,9 +819,9 @@
         <widget class="QWidget" name="horizontalLayoutWidget_2">
          <property name="geometry">
           <rect>
-           <x>490</x>
-           <y>470</y>
-           <width>219</width>
+           <x>480</x>
+           <y>530</y>
+           <width>241</width>
            <height>80</height>
           </rect>
          </property>
@@ -839,6 +844,19 @@
            </widget>
           </item>
          </layout>
+        </widget>
+        <widget class="QPushButton" name="ids_outside_btn">
+         <property name="geometry">
+          <rect>
+           <x>490</x>
+           <y>470</y>
+           <width>93</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>IDS camera start</string>
+         </property>
         </widget>
        </widget>
       </item>

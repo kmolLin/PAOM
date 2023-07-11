@@ -82,11 +82,11 @@ class LoadAIModel:
             scores = prediction[0]['scores'][i]
             # Draw contours:
             if label == 1:
-                cv2.drawContours(img, contours, -1, (0, 0, 255), 3)
+                # cv2.drawContours(img, contours, -1, (0, 0, 255), 3)
                 cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 4)
                 cv2.putText(img, f'{scores:.3f}', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (255, 255, 0), 5)
             elif label == 2:
-                cv2.drawContours(img, contours, -1, (0, 0, 255), 1)
+                # cv2.drawContours(img, contours, -1, (0, 0, 255), 1)
                 cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 4)
                 cv2.putText(img, 'mark_type_2', (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0))
 

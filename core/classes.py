@@ -69,7 +69,7 @@ class Thread_slect_focus(QThread):
         tmp = []
 
         # test for continue get image from array
-        data = f"G91\nG1E1000F{1000}\nG90\nM114\n"
+        data = f"G91\nG1E1300F{1000}\nG90\nM114\n"
         self.send_thread.motion_step = [data]
         self.send_thread.start()
         self.msleep(200)
@@ -77,16 +77,19 @@ class Thread_slect_focus(QThread):
         current_time = time.strftime("%Y_%m_%d_%H_%M_%S", t)
         folder_path = f"C:/Users/smpss/kmol/save_img_experiment/{current_time}"
         os.mkdir(folder_path)
-        for i in range(300):
+        for i in range(400):
             cv2.imwrite(f"{folder_path}/{i:03d}.bmp", self.image_arr)
             self.msleep(200)
 
         files = os.listdir(folder_path)
         files.sort(key=lambda x: os.path.getmtime(f"{folder_path}/{x}"))
-        merge_padding = 20
+        merge_padding = 10
 
-        result = loadimage_process(folder_path, files, merge_padding, len(files), select=1, image_perline=0)
-        cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/template_matching_merge/{current_time}.jpg", result)
+        result = loadimage_process(folder_path, files, merge_padding, len(files), select=0, image_perline=0)
+        filp_image = cv2.flip(result, 0)
+        filp_image = cv2.flip(filp_image, 1)
+        # filp_image = cv2.cvtColor(filp_image, cv2.COLOR_BGR2GRAY)
+        cv2.imwrite(f"C:/Users/smpss/kmol/save_img_experiment/template_matching_merge/{current_time}.jpg", filp_image)
         # self.send_thread.motion_step = self.commads
         # self.send_thread.start()
         # self.send_thread.wait()

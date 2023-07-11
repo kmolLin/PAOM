@@ -39,6 +39,10 @@ def loadimage_process(path: str,
     # constant variable
     src_img_width = 150
     Tem_img_width = 100
+    
+    ## 0620 公準 setting
+    src_img_width = 500
+    Tem_img_width = 450
 
     MatchingPointBuf = []
     src_img_buffer = []

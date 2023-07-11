@@ -21,9 +21,15 @@ import math
 import time
 import cv2
 from . import icon
+import subprocess
 
 import TIS.Imaging
 from System import TimeSpan
+
+class WorkerThread(QThread):
+    def run(self):
+        # 执行外部脚本的操作
+        subprocess.run(["python", "parrel_test.py"])
 
 
 class MainWindow(QMainWindow):
@@ -62,7 +68,7 @@ class MainWindow(QMainWindow):
         self.wait_controler.zoomcommand_signal.connect(self.zoom_command.get_image)
         self.count = 0
 
-        self._serial_context_ = SerialPortContext(port="COM0", baud=0)
+        self._serial_context_ = SerialPortContext(port="COM5", baud=0)
         self._receive_signal.connect(self.wait_controler.test_received)
 
         # test for for the form
@@ -202,14 +208,14 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def on_move_btn_posstive_clicked(self):
         value = self.rotate_spinbox.value()
-        f = 2000
+        f = 1500
         data = f"G91\nG1E{value}F{f}\nG90\nM114\n"
         self.__test__send(data)
 
     @pyqtSlot()
     def on_move_btn_negtive_clicked(self):
         value = self.rotate_spinbox.value()
-        f = 2000
+        f = 1500
         data = f"G91\nG1E-{value}F{f}\nG90\nM114\n"
         self.__test__send(data)
 
@@ -219,6 +225,16 @@ class MainWindow(QMainWindow):
         self.__test__send("G28 X0")
         self.__test__send("G28 Z0")
         self.__test__send("M114")
+        
+    @pyqtSlot()
+    def on_ids_outside_btn_clicked(self):
+        print("test")
+        # 
+        f = 1500
+        data = f"G91\nG1E-1300F{f}\nG90\nM114\n"
+        # self.__test__send(data)
+        self.worker_thread = WorkerThread()
+        self.worker_thread.start()
 
     @pyqtSlot()
     def on_test_focus_btn_clicked(self):
